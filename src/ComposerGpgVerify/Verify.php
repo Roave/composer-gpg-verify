@@ -60,6 +60,17 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
             var_dump($vendorDir->getRealPath()); // @TODO will need to check that it is a dir
 
+            if (! is_dir($vendorDir->getRealPath() . '/.git')) {
+                $packages[$packageName] = [
+                    'git'       => false,
+                    'signed'    => false,
+                    'signature' => '',
+                    'verified'  => false,
+                ];
+
+                continue;
+            }
+
             // because PHP is a moronic language, by-ref is everywhere in the standard library
             $output = [];
 

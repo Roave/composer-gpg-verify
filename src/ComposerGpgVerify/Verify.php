@@ -100,12 +100,12 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                             escapeshellarg($vendorDir->getRealPath() . '/.git'),
                             escapeshellarg($tag)
                         ),
-                        $tagOutput,
+                        $tagSignatureOutput,
                         $signed
                     );
 
                     if ($signed) {
-                        $output = array_merge($output, $tagOutput);
+                        $output = array_merge($output, $tagSignatureOutput);
 
                         break;
                     }

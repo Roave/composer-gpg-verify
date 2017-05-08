@@ -47,6 +47,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO
         );
 
+        $packages = [];
+
         foreach ($vendorDirs as $vendorDir) {
             if (! $vendorDir->isDir()) {
                 var_dump('Not a dir: ' . $vendorDir->getRealPath());
@@ -54,12 +56,29 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
+            $packageName = basename(dirname($vendorDir->getRealPath())) . '/' . $vendorDir->getBasename();
+
             var_dump($vendorDir->getRealPath()); // @TODO will need to check that it is a dir
 
-            system(sprintf(
-                'git --git-dir %s verify-commit --verbose HEAD',
-                escapeshellarg($vendorDir->getRealPath() . '/.git')
-            ));
+            // because PHP is a moronic language, by-ref is everywhere in the standard library
+            $output = [];
+
+            exec(
+                sprintf(
+                    'git --git-dir %s verify-commit --verbose HEAD',
+                    escapeshellarg($vendorDir->getRealPath() . '/.git')
+                ),
+                $output,
+                $return
+            );
+
+            $packages[$packageName] = [
+                'git'      => 'dunno',
+                'signed'   => $output,
+                'verified' => 'dunno',
+            ];
         }
+
+        var_dump($packages);
     }
 }

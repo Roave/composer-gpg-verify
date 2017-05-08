@@ -77,14 +77,46 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                     escapeshellarg($vendorDir->getRealPath() . '/.git')
                 ),
                 $output,
-                $return
+                $signed
             );
+
+            if (! $signed) {
+                // again, moronic language.
+                $tags = [];
+
+                exec(
+                    sprintf(
+                        'git --git-dir %s tag --points-at HEAD',
+                        escapeshellarg($vendorDir->getRealPath() . '/.git')
+                    ),
+                    $tags
+                );
+
+                // go through all found tags, see if at least one is signed
+                foreach (array_filter($tags) as $tag) {
+                    exec(
+                        sprintf(
+                            'git --git-dir %s tag -v %s',
+                            escapeshellarg($vendorDir->getRealPath() . '/.git'),
+                            escapeshellarg($tag)
+                        ),
+                        $tagOutput,
+                        $signed
+                    );
+
+                    if ($signed) {
+                        $output = array_merge($output, $tagOutput);
+
+                        break;
+                    }
+                }
+            }
 
             $packages[$packageName] = [
                 'git'       => 'dunno',
                 'signed'    => (bool) $output,
                 'signature' => implode("\n", $output),
-                'verified'  => ! $return,
+                'verified'  => ! $signed,
             ];
         }
 

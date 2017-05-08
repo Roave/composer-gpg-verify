@@ -75,7 +75,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             $packages[$packageName] = [
                 'git'      => 'dunno',
                 'signed'   => $output,
-                'verified' => 'dunno',
+                'verified' => ! $return,
             ];
         }
 

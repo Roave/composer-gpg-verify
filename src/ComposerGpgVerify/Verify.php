@@ -55,6 +55,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             }
 
             var_dump($vendorDir->getPath()); // @TODO will need to check that it is a dir
+
+            system(sprintf('git --git-dir %s verify-commit --verbose HEAD', escapeshellarg($vendorDir->getPath())));
         }
     }
 }

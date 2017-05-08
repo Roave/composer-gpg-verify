@@ -30,13 +30,13 @@
         }
     },
     "extra": {
-        "class": "ComposerGpgVerify\\Verifier",
+        "class": "ComposerGpgVerify\\Verify",
         "branch-alias": {
             "dev-master": "2.0.x-dev"
         }
     },
     "scripts": {
-        "post-update-cmd":  "PackageVersions\\Verifier::verifyDownloadedTags",
-        "post-install-cmd": "PackageVersions\\Verifier::verifyDownloadedTags"
+        "post-update-cmd":  "PackageVersions\\Verify::verifyDownloadedTags",
+        "post-install-cmd": "PackageVersions\\Verify::verifyDownloadedTags"
     }
 }

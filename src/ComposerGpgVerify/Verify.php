@@ -63,6 +63,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             // because PHP is a moronic language, by-ref is everywhere in the standard library
             $output = [];
 
+            // @TODO check check tags if the commit isn't signed
             exec(
                 sprintf(
                     'git --git-dir %s verify-commit --verbose HEAD',

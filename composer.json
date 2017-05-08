@@ -36,7 +36,7 @@
         }
     },
     "scripts": {
-        "post-update-cmd":  "PackageVersions\\Verify::verifyDownloadedTags",
-        "post-install-cmd": "PackageVersions\\Verify::verifyDownloadedTags"
+        "post-update-cmd":  "ComposerGpgVerify\\Verify::verify",
+        "post-install-cmd": "ComposerGpgVerify\\Verify::verify"
     }
 }

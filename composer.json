@@ -1,0 +1,42 @@
+{
+    "name": "ocramius/composer-git-gpg-verify",
+    "description": "Composer plugin that verifies GPG signatures of downloaded dependencies, enforcing trusted GIT tags",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Pivetta",
+            "email": "ocramius@gmail.com"
+        }
+    ],
+    "require": {
+        "php":                 "~7.0",
+        "composer-plugin-api": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit":   "^5.7.5",
+        "humbug/humbug":     "dev-master",
+        "composer/composer": "^1.3",
+        "ext-zip":           "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ComposerGpgVerify\\": "src/ComposerGpgVerify"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ComposerGpgVerifyTest\\": "test/ComposerGpgVerifyTest"
+        }
+    },
+    "extra": {
+        "class": "ComposerGpgVerify\\Verifier",
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
+    },
+    "scripts": {
+        "post-update-cmd":  "PackageVersions\\Verifier::verifyDownloadedTags",
+        "post-install-cmd": "PackageVersions\\Verifier::verifyDownloadedTags"
+    }
+}

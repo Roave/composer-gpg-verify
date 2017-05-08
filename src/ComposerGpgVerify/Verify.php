@@ -51,14 +51,10 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         foreach ($vendorDirs as $vendorDir) {
             if (! $vendorDir->isDir()) {
-                var_dump('Not a dir: ' . $vendorDir->getRealPath());
-
                 continue;
             }
 
             $packageName = basename(dirname($vendorDir->getRealPath())) . '/' . $vendorDir->getBasename();
-
-            var_dump($vendorDir->getRealPath()); // @TODO will need to check that it is a dir
 
             if (! is_dir($vendorDir->getRealPath() . '/.git')) {
                 $packages[$packageName] = [
@@ -77,7 +73,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             // @TODO check check tags if the commit isn't signed
             exec(
                 sprintf(
-                    'git --git-dir %s verify-commit --verbose HEAD',
+                    'git --git-dir %s verify-commit --verbose HEAD 2>&1',
                     escapeshellarg($vendorDir->getRealPath() . '/.git')
                 ),
                 $output,

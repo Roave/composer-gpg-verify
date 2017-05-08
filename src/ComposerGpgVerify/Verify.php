@@ -49,14 +49,17 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         foreach ($vendorDirs as $vendorDir) {
             if (! $vendorDir->isDir()) {
-                var_dump('Not a dir: ' . $vendorDir->getPath());
+                var_dump('Not a dir: ' . $vendorDir->getRealPath());
 
                 continue;
             }
 
-            var_dump($vendorDir->getPath()); // @TODO will need to check that it is a dir
+            var_dump($vendorDir->getRealPath()); // @TODO will need to check that it is a dir
 
-            system(sprintf('git --git-dir %s verify-commit --verbose HEAD', escapeshellarg($vendorDir->getPath())));
+            system(sprintf(
+                'git --git-dir %s verify-commit --verbose HEAD',
+                escapeshellarg($vendorDir->getRealPath() . '/.git')
+            ));
         }
     }
 }

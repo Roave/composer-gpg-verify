@@ -80,7 +80,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 $signed
             );
 
-            if (! $signed) {
+            if ($signed) {
                 // again, moronic language.
                 $tags = [];
 
@@ -104,7 +104,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                         $signed
                     );
 
-                    if ($signed) {
+                    if (! $signed) {
                         $output = array_merge($output, $tagSignatureOutput);
 
                         break;

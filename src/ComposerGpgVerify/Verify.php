@@ -122,9 +122,36 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         $settings = $composer->getPackage()->getExtra()['composer-gpg-verify'];
 
-        die(var_dump(
-            $settings['allow-unsigned'],
-            $settings['allow-untrusted']
+        $allowedUnsigned  = $settings['allow-unsigned'];
+        $allowedUntrusted = $settings['allow-untrusted'];
+
+        $unSigned = array_keys(array_filter(
+            $packages,
+            function (array $package) : bool {
+                return ! $package['signed'];
+            }
+        ));
+
+        $unVerified = array_keys(array_filter(
+            $packages,
+            function (array $package) : bool {
+                return ! $package['verified'];
+            }
+        ));
+
+        $requiringSignature    = array_diff($unSigned, $allowedUnsigned);
+        $requiringVerification = array_diff($unVerified, $allowedUntrusted);
+
+        $escapes = array_values(array_unique(array_merge($requiringSignature, $requiringVerification)));
+
+        if (! $escapes) {
+            return;
+        }
+
+        throw new \RuntimeException(sprintf(
+            'The following packages need to be signed and verified, or added to exclusions: %s%s',
+            "\n",
+            implode("\n", $escapes)
         ));
     }
 }

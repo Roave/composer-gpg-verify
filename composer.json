@@ -33,6 +33,12 @@
         "class": "ComposerGpgVerify\\Verify",
         "branch-alias": {
             "dev-master": "2.0.x-dev"
+        },
+        "composer-gpg-verify": {
+            "allow-unsigned": {
+            },
+            "allow-untrusted": {
+            }
         }
     },
     "scripts": {

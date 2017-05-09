@@ -119,5 +119,12 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 'verified'  => ! $signed,
             ];
         }
+
+        $settings = $composer->getPackage()->getExtra()['composer-gpg-verify'];
+
+        die(var_dump(
+            $settings['allow-unsigned'],
+            $settings['allow-untrusted']
+        ));
     }
 }

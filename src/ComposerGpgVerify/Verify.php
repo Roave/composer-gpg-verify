@@ -86,7 +86,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
                 exec(
                     sprintf(
-                        'git --git-dir %s tag --points-at HEAD',
+                        'git --git-dir %s tag --points-at HEAD 2>&1',
                         escapeshellarg($vendorDir->getRealPath() . '/.git')
                     ),
                     $tags
@@ -96,7 +96,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 foreach (array_filter($tags) as $tag) {
                     exec(
                         sprintf(
-                            'git --git-dir %s tag -v %s',
+                            'git --git-dir %s tag -v %s 2>&1',
                             escapeshellarg($vendorDir->getRealPath() . '/.git'),
                             escapeshellarg($tag)
                         ),
@@ -119,7 +119,5 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 'verified'  => ! $signed,
             ];
         }
-
-        var_dump($packages);
     }
 }

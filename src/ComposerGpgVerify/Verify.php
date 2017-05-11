@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ComposerGpgVerify;
 
 use Composer\Composer;
+use Composer\Config;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
@@ -35,18 +36,17 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         // Nothing to do here, as all features are provided through event listeners
     }
 
+    /**
+     * @param Event $composerEvent
+     * @throws \LogicException
+     * @throws \RuntimeException
+     */
     public static function verify(Event $composerEvent) : void
     {
         $composer         = $composerEvent->getComposer();
         $config           = $composer->getConfig();
-        $preferredInstall = $config->get('preferred-install');
 
-        if ('source' !== $config->get('preferred-install')) {
-            throw new \LogicException(sprintf(
-                'Expected installation "preferred-install" to be "source", found "%s" instead',
-                (string) $preferredInstall
-            ));
-        }
+        self::assertSourceInstallation($config);
 
         $vendorDir = $config->get('vendor-dir');
 
@@ -163,5 +163,24 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             "\n",
             implode("\n", $escapes)
         ));
+    }
+
+    /**
+     * @param Config $config
+     *
+     *
+     * @throws \LogicException
+     * @throws \RuntimeException
+     */
+    private static function assertSourceInstallation(Config $config) : void
+    {
+        $preferredInstall = $config->get('preferred-install');
+
+        if ('source' !== $preferredInstall) {
+            throw new \LogicException(sprintf(
+                'Expected installation "preferred-install" to be "source", found "%s" instead',
+                (string) $preferredInstall
+            ));
+        }
     }
 }

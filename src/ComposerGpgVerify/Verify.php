@@ -37,8 +37,18 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
     public static function verify(Event $composerEvent) : void
     {
-        $composer  = $composerEvent->getComposer();
-        $vendorDir = $composer->getConfig()->get('vendor-dir');
+        $composer         = $composerEvent->getComposer();
+        $config           = $composer->getConfig();
+        $preferredInstall = $config->get('preferred-install');
+
+        if ('source' !== $config->get('preferred-install')) {
+            throw new \LogicException(sprintf(
+                'Expected installation "preferred-install" to be "source", found "%s" instead',
+                (string) $preferredInstall
+            ));
+        }
+
+        $vendorDir = $config->get('vendor-dir');
 
         // @todo that `$vendorDir` may include special chars
         /* @var $vendorDirs \GlobIterator|\SplFileInfo[]*/

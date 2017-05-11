@@ -30,6 +30,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @codeCoverageIgnore
      */
     public function activate(Composer $composer, IOInterface $io)
     {

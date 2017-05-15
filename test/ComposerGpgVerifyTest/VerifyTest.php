@@ -10,6 +10,7 @@ use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use ComposerGpgVerify\Verify;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 /**
  * @covers \ComposerGpgVerify\Verify
@@ -78,5 +79,34 @@ final class VerifyTest extends TestCase
             self::assertInternalType('string', $callback);
             self::assertInternalType('callable', [Verify::class, $callback]);
         }
+    }
+
+    public function testWillAcceptSignedPackages() : void
+    {
+        $workDir = $this->makeGpgHomeDirectory();
+
+        self::markTestIncomplete();
+
+
+        mkdir($workDir . '/gpg');
+        mkdir($workDir . '/vendor');
+        mkdir($workDir . '/vendor/an-awesome-maintainer');
+        mkdir($workDir . '/vendor/an-awesome-maintainer/package1');
+
+        // @TODO gpg generate own key
+        // @TODO gpg generate an-awesome-maintainer key
+        // @TODO create git repo for package1
+        // @TODO git sign package1
+        // @TODO sign an-awesome-maintainer key with own key
+        // @TODO assert on vendor validity
+    }
+
+    private function makeGpgHomeDirectory() : string
+    {
+        $homeDirectory = sys_get_temp_dir() . '/' . uniqid('gpg-verification-test', true);
+
+        self::assertTrue(mkdir($homeDirectory));
+
+        return $homeDirectory;
     }
 }

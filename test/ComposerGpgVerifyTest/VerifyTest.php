@@ -113,6 +113,36 @@ final class VerifyTest extends TestCase
         Verify::verify($this->event);
     }
 
+    public function testWillAcceptSignedAndTrustedTaggedPackages() : void
+    {
+        $gpgHomeDirectory = $this->makeGpgHomeDirectory();
+
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorKey   = $this->makeKey($gpgHomeDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->createDependencySignedTag($vendor1, $gpgHomeDirectory, $vendorKey);
+
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDir;
+            });
+
+        putenv('GNUPGHOME=' . $gpgHomeDirectory);
+
+        Verify::verify($this->event);
+    }
+
     private function makeVendorDirectory() : string
     {
         $vendorDirectory = sys_get_temp_dir() . '/' . uniqid('vendor', true);
@@ -140,6 +170,28 @@ final class VerifyTest extends TestCase
             ->mustRun();
     }
 
+    private function createDependencySignedTag(
+        string $dependencyDirectory,
+        string $gpgHomeDirectory,
+        string $signingKey
+    ) : void {
+        (new Process(sprintf('git config --local --add user.signingkey %s', escapeshellarg($signingKey)), $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process('git commit --allow-empty -m "unsigned commit"', $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process(
+            'git tag -s "tag-name" -m "signed tag"',
+            $dependencyDirectory,
+            ['GNUPGHOME' => $gpgHomeDirectory, 'GIT_TRACE' => '2']
+        ))
+            ->setTimeout(30)
+            ->mustRun();
+    }
+
     private function makeDependencyGitRepository(
         string $vendorDirectory,
         string $packageName,
@@ -154,11 +206,11 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
-        (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyDirectory))
+        (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyRepository))
             ->setTimeout(30)
             ->mustRun();
 
-        (new Process(sprintf('git config --local --add user.name %s', escapeshellarg($name)), $dependencyDirectory))
+        (new Process(sprintf('git config --local --add user.name %s', escapeshellarg($name)), $dependencyRepository))
             ->setTimeout(30)
             ->mustRun();
 

@@ -143,6 +143,41 @@ final class VerifyTest extends TestCase
         Verify::verify($this->event);
     }
 
+    public function testWillRejectUnSignedCommitsFromUntrustedKeys() : void
+    {
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        (new Process('git commit --allow-empty -m "unsigned commit"', $vendor1))
+            ->setTimeout(30)
+            ->mustRun();
+
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDir;
+            });
+
+        putenv('GNUPGHOME=' . $this->makeGpgHomeDirectory());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The following packages need to be signed and verified, or added to exclusions: '
+            . "\nvendor1/package1"
+        );
+
+        Verify::verify($this->event);
+    }
+
     public function testWillRejectSignedCommitsFromUntrustedKeys() : void
     {
         $personalGpgDirectory = $this->makeGpgHomeDirectory();

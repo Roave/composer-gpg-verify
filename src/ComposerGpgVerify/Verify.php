@@ -92,6 +92,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 $signed
             );
 
+            $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($output);
+
             if ($signed) {
                 // again, moronic language.
                 $tags = [];
@@ -170,6 +172,16 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             "\n",
             implode("\n", $escapes)
         ));
+    }
+
+    private static function verifySignatureValidationHasNoWarnings(array $output) : bool
+    {
+        return ! array_filter(
+            $output,
+            function (string $outputRow) {
+                return false !== strpos($outputRow, 'gpg: WARNING: ');
+            }
+        );
     }
 
     /**

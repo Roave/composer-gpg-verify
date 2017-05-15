@@ -83,7 +83,7 @@ final class VerifyTest extends TestCase
         }
     }
 
-    public function testWillAcceptSignedPackages() : void
+    public function testWillAcceptSignedAndTrustedPackages() : void
     {
         $gpgHomeDirectory = $this->makeGpgHomeDirectory();
 

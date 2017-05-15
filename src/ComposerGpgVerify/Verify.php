@@ -118,6 +118,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                         $signed
                     );
 
+                    $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($tagSignatureOutput);
+
                     if (! $signed) {
                         $output = array_merge($output, $tagSignatureOutput);
 

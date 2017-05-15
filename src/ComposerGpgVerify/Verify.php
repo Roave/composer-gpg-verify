@@ -132,10 +132,15 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             ];
         }
 
-        $settings = $composer->getPackage()->getExtra()['composer-gpg-verify'];
+        // @TODO configuration WILL arrive, but for now I'm too lazy, so GTFO
+//        $settings = $composer->getPackage()->getExtra()['composer-gpg-verify'];
+//
+//        $allowedUnsigned  = $settings['allow-unsigned'];
+//        $allowedUntrusted = $settings['allow-untrusted'];
 
-        $allowedUnsigned  = $settings['allow-unsigned'];
-        $allowedUntrusted = $settings['allow-untrusted'];
+        $allowedUnsigned  = [];
+        $allowedUntrusted = [];
+
 
         $unSigned = array_keys(array_filter(
             $packages,

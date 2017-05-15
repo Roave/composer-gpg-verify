@@ -113,6 +113,121 @@ final class VerifyTest extends TestCase
         Verify::verify($this->event);
     }
 
+    public function testWillRejectPackageSignedWithImportedButUnTrustedKey() : void
+    {
+        $personalGpgDirectory = $this->makeGpgHomeDirectory();
+        $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
+
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+        $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+
+        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
+
+        (new Process(
+            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $foreignGpgDirectory]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        self::assertFileExists($exportPath);
+
+        (new Process(
+            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $personalGpgDirectory]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDir;
+            });
+
+        putenv('GNUPGHOME=' . $personalGpgDirectory);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The following packages need to be signed and verified, or added to exclusions: '
+            . "\nvendor1/package1"
+        );
+
+        Verify::verify($this->event);
+    }
+
+    public function testWillAcceptPackageSignedWithImportedAndTrustedKey() : void
+    {
+        self::markTestIncomplete('not yet completely written - signing of foreign key missing');
+        $personalGpgDirectory = $this->makeGpgHomeDirectory();
+        $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
+
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+        $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+
+        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
+
+        (new Process(
+            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $foreignGpgDirectory]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        self::assertFileExists($exportPath);
+
+        (new Process(
+            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $personalGpgDirectory]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDir;
+            });
+
+        putenv('GNUPGHOME=' . $personalGpgDirectory);
+
+        Verify::verify($this->event);
+    }
+
     public function testWillAcceptSignedAndTrustedTaggedPackages() : void
     {
         $gpgHomeDirectory = $this->makeGpgHomeDirectory();

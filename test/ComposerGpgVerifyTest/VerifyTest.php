@@ -83,11 +83,15 @@ final class VerifyTest extends TestCase
 
     public function testWillAcceptSignedPackages() : void
     {
-        $workDir = $this->makeGpgHomeDirectory();
+        $gpgHomeDirectory = $this->makeGpgHomeDirectory();
 
-        $vendorKey = $this->makeKey($workDir, 'magoo@example.com', 'Mr. Magoo');
-        $vendorDir = $this->makeVendorDirectory();
-        $vendor1   = $this->makeDependencyGitRepository($vendorDir, 'vendor1');
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorKey   = $this->makeKey($gpgHomeDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1');
+
+        $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey, $vendorName, $vendorEmail);
 
         self::markTestIncomplete();
 
@@ -112,6 +116,31 @@ final class VerifyTest extends TestCase
         self::assertTrue(mkdir($vendorDirectory));
 
         return $vendorDirectory;
+    }
+
+    private function signDependency(
+        string $dependencyDirectory,
+        string $gpgHomeDirectory,
+        string $signingKey,
+        string $name,
+        string $email // @todo we should make an object out of this bullshit
+    ) : void {
+
+        (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process(sprintf('git config --local --add user.name %s', escapeshellarg($name)), $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process(sprintf('git config --local --add user.signingkey %s', escapeshellarg($signingKey)), $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process('git commit --allow-empty -m "signed commit" -S', $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
     }
 
     private function makeDependencyGitRepository(string $vendorDirectory, string $repositoryName) : string

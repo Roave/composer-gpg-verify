@@ -125,7 +125,6 @@ final class VerifyTest extends TestCase
         string $name,
         string $email // @todo we should make an object out of this bullshit
     ) : void {
-
         (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyDirectory))
             ->setTimeout(30)
             ->mustRun();
@@ -138,7 +137,11 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
-        (new Process('git commit --allow-empty -m "signed commit" -S', $dependencyDirectory))
+        (new Process(
+            'git commit --allow-empty -m "signed commit" -S',
+            $dependencyDirectory,
+            ['GNUPGHOME' => $gpgHomeDirectory, 'GIT_TRACE' => '2']
+        ))
             ->setTimeout(30)
             ->mustRun();
     }
@@ -174,7 +177,8 @@ Key-Length: 1024
 Name-Real: <<<NAME>>>
 Name-Email: <<<EMAIL>>>
 Expire-Date: 0
-Passphrase: aaa
+%no-protection
+%no-ask-passphrase
 %commit
 %echo done
 
@@ -187,7 +191,11 @@ KEY;
             )
         );
 
-        $keyOutput = (new Process('gpg --batch --gen-key -a key-info.txt', $gpgHomeDirectory))
+        $keyOutput = (new Process(
+            'gpg --batch --gen-key -a key-info.txt',
+            $gpgHomeDirectory,
+            ['GNUPGHOME' => $gpgHomeDirectory]
+        ))
             ->setTimeout(30)
             ->mustRun()
             ->getErrorOutput();

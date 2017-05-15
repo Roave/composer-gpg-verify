@@ -42,6 +42,8 @@ final class VerifyTest extends TestCase
 
         $this->event->expects(self::any())->method('getComposer')->willReturn($this->composer);
         $this->composer->expects(self::any())->method('getConfig')->willReturn($this->config);
+
+        // @TODO restore GNUPGHOME after test execution - back it up here, then reset later
     }
 
     public function testWillDisallowPluginInstantiation() : void
@@ -89,24 +91,26 @@ final class VerifyTest extends TestCase
         $vendorEmail = 'magoo@example.com';
         $vendorKey   = $this->makeKey($gpgHomeDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
-        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1');
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1');
 
         $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey, $vendorName, $vendorEmail);
 
-        self::markTestIncomplete();
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
 
+                return $vendorDir;
+            });
 
-        mkdir($workDir . '/gpg');
-        mkdir($workDir . '/vendor');
-        mkdir($workDir . '/vendor/an-awesome-maintainer');
-        mkdir($workDir . '/vendor/an-awesome-maintainer/package1');
+        putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
-        // @TODO gpg generate own key
-        // @TODO gpg generate an-awesome-maintainer key
-        // @TODO create git repo for package1
-        // @TODO git sign package1
-        // @TODO sign an-awesome-maintainer key with own key
-        // @TODO assert on vendor validity
+        Verify::verify($this->event);
     }
 
     private function makeVendorDirectory() : string
@@ -150,7 +154,7 @@ final class VerifyTest extends TestCase
     {
         $dependencyRepository = $vendorDirectory . '/' . $repositoryName;
 
-        self::assertTrue(mkdir($dependencyRepository));
+        self::assertTrue(mkdir($dependencyRepository, 0777, true));
 
         (new Process('git init', $dependencyRepository))
             ->setTimeout(30)

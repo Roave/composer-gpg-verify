@@ -164,13 +164,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            'The following packages need to be signed and verified, or added to exclusions: '
-            . "\nvendor1/package1"
-        );
-
-        Verify::verify($this->event);
+        $this->assertWillFailPackageVerification();
     }
 
     public function testWillAcceptPackageSignedWithImportedAndTrustedKey() : void
@@ -287,13 +281,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            'The following packages need to be signed and verified, or added to exclusions: '
-            . "\nvendor1/package1"
-        );
-
-        Verify::verify($this->event);
+        $this->assertWillFailPackageVerification();
     }
 
     public function testWillAcceptPackageTaggedAndSignedWithImportedAndTrustedKey() : void
@@ -415,13 +403,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $this->makeGpgHomeDirectory());
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            'The following packages need to be signed and verified, or added to exclusions: '
-            . "\nvendor1/package1"
-        );
-
-        Verify::verify($this->event);
+        $this->assertWillFailPackageVerification();
     }
 
     public function testWillRejectSignedCommitsFromUntrustedKeys() : void
@@ -452,13 +434,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            'The following packages need to be signed and verified, or added to exclusions: '
-            . "\nvendor1/package1"
-        );
-
-        Verify::verify($this->event);
+        $this->assertWillFailPackageVerification();
     }
 
     private function makeVendorDirectory() : string
@@ -581,5 +557,17 @@ KEY;
         preg_match('/key ([0-9A-F]+) marked as ultimately trusted/i', $keyOutput, $matches);
 
         return $matches[1];
+    }
+
+    private function assertWillFailPackageVerification(string ...$packages) : void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The following packages need to be signed and verified, or added to exclusions: '
+            . "\n"
+            . implode("\n", $packages)
+        );
+
+        Verify::verify($this->event);
     }
 }

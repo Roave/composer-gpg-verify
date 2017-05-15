@@ -91,9 +91,9 @@ final class VerifyTest extends TestCase
         $vendorEmail = 'magoo@example.com';
         $vendorKey   = $this->makeKey($gpgHomeDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
-        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1');
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
 
-        $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey, $vendorName, $vendorEmail);
+        $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey);
 
         $this
             ->config
@@ -125,18 +125,8 @@ final class VerifyTest extends TestCase
     private function signDependency(
         string $dependencyDirectory,
         string $gpgHomeDirectory,
-        string $signingKey,
-        string $name,
-        string $email // @todo we should make an object out of this bullshit
+        string $signingKey
     ) : void {
-        (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyDirectory))
-            ->setTimeout(30)
-            ->mustRun();
-
-        (new Process(sprintf('git config --local --add user.name %s', escapeshellarg($name)), $dependencyDirectory))
-            ->setTimeout(30)
-            ->mustRun();
-
         (new Process(sprintf('git config --local --add user.signingkey %s', escapeshellarg($signingKey)), $dependencyDirectory))
             ->setTimeout(30)
             ->mustRun();
@@ -150,13 +140,25 @@ final class VerifyTest extends TestCase
             ->mustRun();
     }
 
-    private function makeDependencyGitRepository(string $vendorDirectory, string $repositoryName) : string
-    {
-        $dependencyRepository = $vendorDirectory . '/' . $repositoryName;
+    private function makeDependencyGitRepository(
+        string $vendorDirectory,
+        string $packageName,
+        string $email,
+        string $name
+    ) : string {
+        $dependencyRepository = $vendorDirectory . '/' . $packageName;
 
         self::assertTrue(mkdir($dependencyRepository, 0777, true));
 
         (new Process('git init', $dependencyRepository))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process(sprintf('git config --local --add user.email %s', escapeshellarg($email)), $dependencyDirectory))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process(sprintf('git config --local --add user.name %s', escapeshellarg($name)), $dependencyDirectory))
             ->setTimeout(30)
             ->mustRun();
 

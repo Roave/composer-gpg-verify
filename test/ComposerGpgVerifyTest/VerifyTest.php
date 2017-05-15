@@ -95,18 +95,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey);
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
@@ -149,18 +138,7 @@ final class VerifyTest extends TestCase
             ->mustRun()
             ->getOutput();
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -212,18 +190,7 @@ final class VerifyTest extends TestCase
             ->mustRun()
             ->getOutput();
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -266,18 +233,7 @@ final class VerifyTest extends TestCase
             ->mustRun()
             ->getOutput();
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -329,18 +285,7 @@ final class VerifyTest extends TestCase
             ->mustRun()
             ->getOutput();
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -359,18 +304,7 @@ final class VerifyTest extends TestCase
 
         $this->createDependencySignedTag($vendor1, $gpgHomeDirectory, $vendorKey);
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
@@ -388,18 +322,7 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $this->makeGpgHomeDirectory());
 
@@ -419,18 +342,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $this
-            ->config
-            ->expects(self::any())
-            ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDir) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDir;
-            });
+        $this->configureCorrectComposerSetup($vendorDir);
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -557,6 +469,22 @@ KEY;
         preg_match('/key ([0-9A-F]+) marked as ultimately trusted/i', $keyOutput, $matches);
 
         return $matches[1];
+    }
+
+    private function configureCorrectComposerSetup(string $vendorDirectory) : void
+    {
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDirectory) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDirectory;
+            });
     }
 
     private function assertWillFailPackageVerification(string ...$packages) : void

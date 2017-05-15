@@ -86,6 +86,8 @@ final class VerifyTest extends TestCase
         $workDir = $this->makeGpgHomeDirectory();
 
         $vendorKey = $this->makeKey($workDir, 'magoo@example.com', 'Mr. Magoo');
+        $vendorDir = $this->makeVendorDirectory();
+        $vendor1   = $this->makeDependencyGitRepository($vendorDir, 'vendor1');
 
         self::markTestIncomplete();
 
@@ -101,6 +103,28 @@ final class VerifyTest extends TestCase
         // @TODO git sign package1
         // @TODO sign an-awesome-maintainer key with own key
         // @TODO assert on vendor validity
+    }
+
+    private function makeVendorDirectory() : string
+    {
+        $vendorDirectory = sys_get_temp_dir() . '/' . uniqid('vendor', true);
+
+        self::assertTrue(mkdir($vendorDirectory));
+
+        return $vendorDirectory;
+    }
+
+    private function makeDependencyGitRepository(string $vendorDirectory, string $repositoryName) : string
+    {
+        $dependencyRepository = $vendorDirectory . '/' . $repositoryName;
+
+        self::assertTrue(mkdir($dependencyRepository));
+
+        (new Process('git init', $dependencyRepository))
+            ->setTimeout(30)
+            ->mustRun();
+
+        return $dependencyRepository;
     }
 
     private function makeGpgHomeDirectory() : string

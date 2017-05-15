@@ -175,7 +175,6 @@ final class VerifyTest extends TestCase
 
     public function testWillAcceptPackageSignedWithImportedAndTrustedKey() : void
     {
-        self::markTestIncomplete('not yet completely written - signing of foreign key missing');
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
@@ -203,6 +202,15 @@ final class VerifyTest extends TestCase
 
         (new Process(
             sprintf('gpg --import < %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $personalGpgDirectory]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        (new Process(
+            sprintf('gpg --batch --yes --sign-key %s', escapeshellarg($vendorKey)),
             null,
             ['GNUPGHOME' => $personalGpgDirectory]
         ))

@@ -85,6 +85,8 @@ final class VerifyTest extends TestCase
     {
         $workDir = $this->makeGpgHomeDirectory();
 
+        $vendorKey = $this->makeKey($workDir, 'magoo@example.com', 'Mr. Magoo');
+
         self::markTestIncomplete();
 
 
@@ -108,5 +110,39 @@ final class VerifyTest extends TestCase
         self::assertTrue(mkdir($homeDirectory));
 
         return $homeDirectory;
+    }
+
+    private function makeKey(string $gpgHomeDirectory, string $emailAddress, string $name) : string
+    {
+        $input = <<<'KEY'
+%echo Generating a standard key
+Key-Type: RSA
+Key-Length: 1024
+Name-Real: <<<NAME>>>
+Name-Email: <<<EMAIL>>>
+Expire-Date: 0
+Passphrase: aaa
+%commit
+%echo done
+
+KEY;
+        self::assertGreaterThan(
+            0,
+            file_put_contents(
+                $gpgHomeDirectory . '/key-info.txt',
+                str_replace(['<<<NAME>>>', '<<<EMAIL>>>'], [$name, $emailAddress], $input)
+            )
+        );
+
+        $keyOutput = (new Process('gpg --batch --gen-key -a key-info.txt', $gpgHomeDirectory))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getErrorOutput();
+
+        self::assertRegExp('/key [0-9A-F]+ marked as ultimately trusted/i', $keyOutput);
+
+        preg_match('/key ([0-9A-F]+) marked as ultimately trusted/i', $keyOutput, $matches);
+
+        return $matches[1];
     }
 }

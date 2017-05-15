@@ -176,6 +176,10 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         ));
     }
 
+    /**
+     * @TODO there must be a better way, seriously. Why does `git verify-tag` not simply produce
+     * @TODO a non-zero exit code when a signature belongs to an untrusted key?!
+     */
     private static function verifySignatureValidationHasNoWarnings(array $output) : bool
     {
         return ! array_filter(

@@ -416,7 +416,7 @@ final class VerifyTest extends TestCase
     {
         $homeDirectory = sys_get_temp_dir() . '/' . uniqid('gpg-verification-test', true);
 
-        self::assertTrue(mkdir($homeDirectory));
+        self::assertTrue(mkdir($homeDirectory, 0700));
 
         return $homeDirectory;
     }

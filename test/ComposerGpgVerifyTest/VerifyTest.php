@@ -116,27 +116,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
-
-        (new Process(
-            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $foreignGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        self::assertFileExists($exportPath);
-
-        (new Process(
-            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+        $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
 
         $this->configureCorrectComposerSetup($vendorDir);
 
@@ -159,36 +139,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
-
-        (new Process(
-            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $foreignGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        self::assertFileExists($exportPath);
-
-        (new Process(
-            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        (new Process(
-            sprintf('gpg --batch --yes --sign-key %s', escapeshellarg($vendorKey)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+        $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, true);
 
         $this->configureCorrectComposerSetup($vendorDir);
 
@@ -211,27 +162,7 @@ final class VerifyTest extends TestCase
 
         $this->createDependencySignedTag($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
-
-        (new Process(
-            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $foreignGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        self::assertFileExists($exportPath);
-
-        (new Process(
-            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+        $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
 
         $this->configureCorrectComposerSetup($vendorDir);
 
@@ -254,36 +185,7 @@ final class VerifyTest extends TestCase
 
         $this->createDependencySignedTag($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
-
-        (new Process(
-            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $foreignGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        self::assertFileExists($exportPath);
-
-        (new Process(
-            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
-
-        (new Process(
-            sprintf('gpg --batch --yes --sign-key %s', escapeshellarg($vendorKey)),
-            null,
-            ['GNUPGHOME' => $personalGpgDirectory]
-        ))
-            ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+        $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, true);
 
         $this->configureCorrectComposerSetup($vendorDir);
 
@@ -497,5 +399,47 @@ KEY;
         );
 
         Verify::verify($this->event);
+    }
+
+    private function importForeignKeys(
+        string $localGpgHome,
+        string $foreignGpgHome,
+        string $foreignKey,
+        bool $sign
+    ) : void {
+        $exportPath = sys_get_temp_dir() . '/' . uniqid('exportedKey', true);
+
+        (new Process(
+            sprintf('gpg --export --armor > %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $foreignGpgHome]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        self::assertFileExists($exportPath);
+
+        (new Process(
+            sprintf('gpg --import < %s', escapeshellarg($exportPath)),
+            null,
+            ['GNUPGHOME' => $localGpgHome]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
+
+        if (! $sign) {
+            return;
+        }
+
+        (new Process(
+            sprintf('gpg --batch --yes --sign-key %s', escapeshellarg($foreignKey)),
+            null,
+            ['GNUPGHOME' => $localGpgHome]
+        ))
+            ->setTimeout(30)
+            ->mustRun()
+            ->getOutput();
     }
 }

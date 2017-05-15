@@ -143,6 +143,43 @@ final class VerifyTest extends TestCase
         Verify::verify($this->event);
     }
 
+    public function testWillRejectSignedCommitsFromUntrustedKeys() : void
+    {
+        $personalGpgDirectory = $this->makeGpgHomeDirectory();
+        $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
+
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+
+        $this
+            ->config
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
+            ->willReturnCallback(function (string $key) use ($vendorDir) {
+                if ('preferred-install' === $key) {
+                    return 'source';
+                }
+
+                return $vendorDir;
+            });
+
+        putenv('GNUPGHOME=' . $personalGpgDirectory);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The following packages need to be signed and verified, or added to exclusions: '
+            . "\nvendor1/package1"
+        );
+
+        Verify::verify($this->event);
+    }
+
     private function makeVendorDirectory() : string
     {
         $vendorDirectory = sys_get_temp_dir() . '/' . uniqid('vendor', true);

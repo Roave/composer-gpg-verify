@@ -213,7 +213,7 @@ final class VerifyTest extends TestCase
         Verify::verify($this->event);
     }
 
-    public function testWillRejectUnSignedCommitsFromUntrustedKeys() : void
+    public function testWillRejectUnSignedCommits() : void
     {
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';

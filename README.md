@@ -140,3 +140,6 @@ that may be uploaded:
 ```sh
 gpg --sign-key AABBCCDDEEFF1122
 ```
+
+Once you did any of the above (signing or trusting), then you may
+resume your composer installation or upgrade process.

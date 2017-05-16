@@ -29,7 +29,7 @@ composer require roave/composer-gpg-verify --prefer-source --no-scripts
 
 ## Trusted dependencies
 
-This package extensively uses [`gpg`](https://www.gnupg.org/) to
+This package extensively uses [`GPG`](https://www.gnupg.org/) to
 validate that all downloaded dependencies have a good and trusted
 GIT tag or commit signature.
 
@@ -56,3 +56,49 @@ your favorite maintainers.
 Good dependency hygiene is extremely important, and this package
 encourages maintainers to always sign their releases, and users
 to always check them.
+
+## Trusting someone's work
+
+Assuming that you downloaded a signed package, you will likely
+get the following failure during the first installation:
+
+```
+composer require some-vendor/some-package --prefer-source
+# ... lots of lines here ...
+The following packages need to be signed and verified, or added to exclusions:
+some-vendor/some-package
+```
+
+This means that `some-vendor/some-package` is not trusted.
+
+Let's try figuring out who signed it:
+
+```sh
+cd vendor/some-vendor/some-package
+# either of the following should work:
+git verify-commit HEAD
+# replace <<CURRENT-TAG>> with the tag you are on
+git tag -v <<CURRENT-TAG>>
+```
+
+You should see something like following in the output:
+
+```
+gpg: Signature made Mi 22 Feb 2017 20:10:00 CET
+gpg:                using RSA key AABBCCDDEEFF1122
+gpg: Can't check signature: No public key
+```
+
+That `AABBCCDDEEFF1122` is the key you are missing. Let's download it:
+
+```
+gpg --recv-keys AABBCCDDEEFF1122
+```
+
+Now the key is in your local DB, but it isn't yet trusted.
+
+**IMPORTANT**: do not blindly trust or sign other people's GPG
+keys - only dod so if you effectively know that the key is provided
+by them, and you know them at least marginally. Usually, contacting
+the key author is the best way to check authenticity.
+

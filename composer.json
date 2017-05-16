@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ComposerGpgVerify\\": "src/ComposerGpgVerify"
+            "Roave\\ComposerGpgVerify\\": "src/Roave/ComposerGpgVerify"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ComposerGpgVerifyTest\\": "test/ComposerGpgVerifyTest"
+            "RoaveTest\\ComposerGpgVerifyTest\\": "test/RoaveTest/ComposerGpgVerify"
         }
     },
     "extra": {
@@ -36,7 +36,7 @@
         }
     },
     "scripts": {
-        "post-update-cmd":  "ComposerGpgVerify\\Verify::verify",
-        "post-install-cmd": "ComposerGpgVerify\\Verify::verify"
+        "post-update-cmd":  "Roave\\ComposerGpgVerify\\Verify::verify",
+        "post-install-cmd": "Roave\\ComposerGpgVerify\\Verify::verify"
     }
 }

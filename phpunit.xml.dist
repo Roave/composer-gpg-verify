@@ -12,8 +12,8 @@
     syntaxCheck="true"
     columns="max"
 >
-    <testsuite name="ComposerGpgVerify tests">
-        <directory>./test/ComposerGpgVerifyTest</directory>
+    <testsuite name="Roave\ComposerGpgVerify tests">
+        <directory>./test/RoaveTest</directory>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">

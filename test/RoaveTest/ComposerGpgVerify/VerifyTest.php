@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ComposerGpgVerifyTest;
+namespace RoaveTest\ComposerGpgVerify;
 
 use Composer\Composer;
 use Composer\Config;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
-use ComposerGpgVerify\Verify;
 use PHPUnit\Framework\TestCase;
+use Roave\ComposerGpgVerify\Verify;
 use Symfony\Component\Process\Process;
 
 /**
- * @covers \ComposerGpgVerify\Verify
+ * @covers \Roave\ComposerGpgVerify\Verify
  */
 final class VerifyTest extends TestCase
 {

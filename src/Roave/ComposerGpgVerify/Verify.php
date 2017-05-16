@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ComposerGpgVerify;
+namespace Roave\ComposerGpgVerify;
 
 use Composer\Composer;
 use Composer\Config;

@@ -1,5 +1,5 @@
 {
-    "name": "roave/composer-git-gpg-verify",
+    "name": "roave/composer-gpg-verify",
     "description": "Composer plugin that verifies GPG signatures of downloaded dependencies, enforcing trusted GIT tags",
     "type": "composer-plugin",
     "license": "MIT",

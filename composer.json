@@ -33,42 +33,6 @@
         "class": "ComposerGpgVerify\\Verify",
         "branch-alias": {
             "dev-master": "2.0.x-dev"
-        },
-        "composer-gpg-verify": {
-            "allow-unsigned": [
-                "composer/ca-bundle",
-                "composer/composer",
-                "composer/semver",
-                "composer/spdx-licenses",
-                "psr/log",
-                "justinrainbow/json-schema",
-                "seld/cli-prompt",
-                "seld/jsonlint",
-                "seld/phar-utils",
-                "symfony/console",
-                "symfony/debug",
-                "symfony/filesystem",
-                "symfony/finder",
-                "symfony/polyfill-mbstring",
-                "symfony/process"
-            ],
-            "allow-untrusted": [
-                "composer/ca-bundle",
-                "composer/composer",
-                "composer/semver",
-                "composer/spdx-licenses",
-                "psr/log",
-                "justinrainbow/json-schema",
-                "seld/cli-prompt",
-                "seld/jsonlint",
-                "seld/phar-utils",
-                "symfony/console",
-                "symfony/debug",
-                "symfony/filesystem",
-                "symfony/finder",
-                "symfony/polyfill-mbstring",
-                "symfony/process"
-            ]
         }
     },
     "scripts": {

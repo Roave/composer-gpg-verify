@@ -339,7 +339,7 @@ final class VerifyTest extends TestCase
         $input = <<<'KEY'
 %echo Generating a standard key
 Key-Type: RSA
-Key-Length: 1024
+Key-Length: 128
 Name-Real: <<<NAME>>>
 Name-Email: <<<EMAIL>>>
 Expire-Date: 0

@@ -26,3 +26,13 @@ un-trusted dependencies:
 ```php
 composer require roave/composer-gpg-verify --prefer-source --no-scripts
 ```
+
+## Trusted dependencies
+
+This package extensively uses [`gpg`](https://www.gnupg.org/) to
+validate that all downloaded dependencies have a good and trusted
+GIT tag or commit signature.
+
+At this moment, the package will just use your local GPG trust
+database to determine which signatures are to be trusted or not,
+and will not mess with it other than reading from it.

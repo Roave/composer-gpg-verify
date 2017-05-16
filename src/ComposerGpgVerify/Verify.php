@@ -169,6 +169,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             return;
         }
 
+        // @TODO report un-trusted signatures emails, names, identifiers (full length, if possible)
+
         throw new \RuntimeException(sprintf(
             'The following packages need to be signed and verified, or added to exclusions: %s%s',
             "\n",

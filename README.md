@@ -98,7 +98,7 @@ gpg --recv-keys AABBCCDDEEFF1122
 Now the key is in your local DB, but it isn't yet trusted.
 
 **IMPORTANT**: do not blindly trust or sign other people's GPG
-keys - only dod so if you effectively know that the key is provided
+keys - only do so if you effectively know that the key is provided
 by them, and you know them at least marginally. Usually, contacting
 the key author is the best way to check authenticity.
 

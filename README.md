@@ -15,7 +15,7 @@ This package provides no usable public API, but will only act during
 the composer installation setup:
 
 ```php
-composer require roave/composer-gpg-verify
+composer require roave/composer-gpg-verify --prefer-source
 ```
 
 Please note that the above may already fail if you have un-trusted
@@ -24,5 +24,5 @@ use the `--no-scripts` flag if you didn't yet figure out your
 un-trusted dependencies:
 
 ```php
-composer require roave/composer-gpg-verify --no-scripts
+composer require roave/composer-gpg-verify --prefer-source --no-scripts
 ```

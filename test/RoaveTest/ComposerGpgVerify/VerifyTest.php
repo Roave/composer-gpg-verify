@@ -415,8 +415,7 @@ KEY;
             ['GNUPGHOME' => $foreignGpgHome]
         ))
             ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+            ->mustRun();
 
         self::assertFileExists($exportPath);
 
@@ -426,8 +425,7 @@ KEY;
             ['GNUPGHOME' => $localGpgHome]
         ))
             ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+            ->mustRun();
 
         if (! $sign) {
             return;
@@ -439,7 +437,6 @@ KEY;
             ['GNUPGHOME' => $localGpgHome]
         ))
             ->setTimeout(30)
-            ->mustRun()
-            ->getOutput();
+            ->mustRun();
     }
 }

@@ -44,7 +44,12 @@ final class GitSignatureCheckTest extends TestCase
                 0,
                 '',
                 false,
-                '',
+                <<<'READABLE'
+[NOT SIGNED] [NOT VERIFIED]    
+Command: 
+Exit code: 0
+Output: 
+READABLE
             ],
         ];
     }

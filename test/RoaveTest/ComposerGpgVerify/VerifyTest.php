@@ -32,9 +32,16 @@ final class VerifyTest extends TestCase
      */
     private $config;
 
+    /**
+     * @var string
+     */
+    private $originalGpgHome;
+
     protected function setUp() : void
     {
         parent::setUp();
+
+        $this->originalGpgHome = getenv('GNUPGHOME');
 
         $this->event    = $this->createMock(Event::class);
         $this->composer = $this->createMock(Composer::class);
@@ -44,6 +51,13 @@ final class VerifyTest extends TestCase
         $this->composer->expects(self::any())->method('getConfig')->willReturn($this->config);
 
         // @TODO restore GNUPGHOME after test execution - back it up here, then reset later
+    }
+
+    protected function tearDown() : void
+    {
+        putenv(sprintf('GNUPGHOME=%s', escapeshellarg((string) $this->originalGpgHome)));
+
+        parent::tearDown();
     }
 
     public function testWillDisallowPluginInstantiation() : void

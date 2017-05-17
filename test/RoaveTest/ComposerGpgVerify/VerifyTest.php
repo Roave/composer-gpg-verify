@@ -41,7 +41,7 @@ final class VerifyTest extends TestCase
     {
         parent::setUp();
 
-        $this->originalGpgHome = getenv('GNUPGHOME');
+        $this->originalGpgHome = (string) getenv('GNUPGHOME');
 
         $this->event    = $this->createMock(Event::class);
         $this->composer = $this->createMock(Composer::class);
@@ -55,7 +55,7 @@ final class VerifyTest extends TestCase
 
     protected function tearDown() : void
     {
-        putenv(sprintf('GNUPGHOME=%s', escapeshellarg((string) $this->originalGpgHome)));
+        putenv(sprintf('GNUPGHOME=%s', escapeshellarg($this->originalGpgHome)));
 
         parent::tearDown();
     }

@@ -51,6 +51,19 @@ Exit code: 0
 Output: 
 READABLE
             ],
+            'not signed' => [
+                $package,
+                'git verify-commit --verbose HEAD',
+                1,
+                '',
+                false,
+                <<<'READABLE'
+[NOT SIGNED] [NOT VERIFIED]    
+Command: git verify-commit --verbose HEAD
+Exit code: 1
+Output: 
+READABLE
+            ],
         ];
     }
 }

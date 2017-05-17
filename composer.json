@@ -26,7 +26,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "RoaveTest\\ComposerGpgVerifyTest\\": "test/RoaveTest/ComposerGpgVerify"
+            "RoaveTest\\ComposerGpgVerify\\": "test/RoaveTest/ComposerGpgVerify"
         }
     },
     "extra": {

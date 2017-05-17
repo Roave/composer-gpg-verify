@@ -64,6 +64,36 @@ Exit code: 1
 Output: 
 READABLE
             ],
+            'signed, no key' => [
+                $package,
+                'git verify-commit --verbose HEAD',
+                1,
+                <<<'OUTPUT'
+tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author Mr. Magoo <magoo@example.com> 1495040303 +0200
+committer Mr. Magoo <magoo@example.com> 1495040303 +0200
+
+signed commit
+gpg: Signature made Mi 17 Mai 2017 18:58:23 CEST
+gpg:                using RSA key ECFE352F73409A6E
+gpg: Can't check signature: No public key
+OUTPUT
+                ,
+                false,
+                <<<'READABLE'
+[SIGNED] [NOT VERIFIED] Commit #4b825dc642cb6eb9a060e54bf8d69288fbee4904   (Key ECFE352F73409A6E)
+Command: git verify-commit --verbose HEAD
+Exit code: 1
+Output: tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author Mr. Magoo <magoo@example.com> 1495040303 +0200
+committer Mr. Magoo <magoo@example.com> 1495040303 +0200
+
+signed commit
+gpg: Signature made Mi 17 Mai 2017 18:58:23 CEST
+gpg:                using RSA key ECFE352F73409A6E
+gpg: Can't check signature: No public key
+READABLE
+            ],
         ];
     }
 }

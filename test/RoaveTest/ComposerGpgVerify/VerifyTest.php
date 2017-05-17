@@ -427,6 +427,7 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
+        /* @var $package PackageInterface|\PHPUnit_Framework_MockObject_MockObject */
         $package = $this->createMock(PackageInterface::class);
 
         $package->expects(self::any())->method('getName')->willReturn($packageName);

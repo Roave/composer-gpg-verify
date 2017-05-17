@@ -130,6 +130,36 @@ gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: AA0E 63DC BC06 F864 F53E  F630 3CD2 E574 BC42 07C7
 READABLE
             ],
+            [
+                $package,
+                'git verify-commit --verbose HEAD',
+                0,
+                <<<'OUTPUT'
+tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author Mr. Magoo <magoo@example.com> 1495041602 +0200
+committer Mr. Magoo <magoo@example.com> 1495041602 +0200
+
+signed commit
+gpg: Signature made Mi 17 Mai 2017 19:20:02 CEST
+gpg:                using RSA key 4889C20D148231DC
+gpg: Good signature from "Mr. Magoo <magoo@example.com>" [full]
+OUTPUT
+                ,
+                true,
+                <<<'READABLE'
+[SIGNED] [VERIFIED] Commit #4b825dc642cb6eb9a060e54bf8d69288fbee4904  By "Mr. Magoo <magoo@example.com>" (Key 4889C20D148231DC)
+Command: git verify-commit --verbose HEAD
+Exit code: 0
+Output: tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author Mr. Magoo <magoo@example.com> 1495041602 +0200
+committer Mr. Magoo <magoo@example.com> 1495041602 +0200
+
+signed commit
+gpg: Signature made Mi 17 Mai 2017 19:20:02 CEST
+gpg:                using RSA key 4889C20D148231DC
+gpg: Good signature from "Mr. Magoo <magoo@example.com>" [full]
+READABLE
+            ],
         ];
     }
 }

@@ -67,13 +67,6 @@ final class VerifyTest extends TestCase
         parent::tearDown();
     }
 
-    public function testWillDisallowPluginInstantiation() : void
-    {
-        $this->expectException(\Throwable::class);
-
-        new Verify();
-    }
-
     public function testWillDisallowInstallationOnNonSourceInstall() : void
     {
         $this

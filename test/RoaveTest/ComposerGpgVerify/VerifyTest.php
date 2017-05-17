@@ -191,7 +191,7 @@ final class VerifyTest extends TestCase
 
         $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -214,7 +214,7 @@ final class VerifyTest extends TestCase
 
         $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
         putenv('LANGUAGE=de_DE');
@@ -246,7 +246,7 @@ final class VerifyTest extends TestCase
 
         $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, true);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -269,7 +269,7 @@ final class VerifyTest extends TestCase
 
         $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -292,7 +292,7 @@ final class VerifyTest extends TestCase
 
         $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, true);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
@@ -311,7 +311,7 @@ final class VerifyTest extends TestCase
 
         $this->createDependencySignedTag($vendor1, $gpgHomeDirectory, $vendorKey);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
@@ -329,7 +329,7 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $this->makeGpgHomeDirectory());
 
@@ -349,7 +349,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 

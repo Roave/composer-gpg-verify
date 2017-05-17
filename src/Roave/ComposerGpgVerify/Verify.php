@@ -164,7 +164,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         return [
             'name'      => $packageName,
-            'git'       => 'dunno',
+            'git'       => true,
             'signed'    => (bool) $output,
             'signature' => implode("\n", $output),
             'verified'  => ! $signed,

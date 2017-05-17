@@ -14,6 +14,9 @@ use Composer\Script\ScriptEvents;
 
 final class Verify implements PluginInterface, EventSubscriberInterface
 {
+    /**
+     * @codeCoverageIgnore
+     */
     private function __construct()
     {
     }
@@ -164,6 +167,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         $requiringVerification = array_diff($unVerified, $allowedUntrusted);
 
         $escapes = array_values(array_unique(array_merge($requiringSignature, $requiringVerification)));
+
+        putenv(sprintf('LANGUAGE=%s', escapeshellarg((string) $originalLanguage)));
 
         if (! $escapes) {
             return;

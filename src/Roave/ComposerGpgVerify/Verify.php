@@ -48,6 +48,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
      */
     public static function verify(Event $composerEvent) : void
     {
+        $originalLanguage = getenv('LANGUAGE');
         $composer         = $composerEvent->getComposer();
         $config           = $composer->getConfig();
 
@@ -63,6 +64,9 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         );
 
         $packages = [];
+
+        // prevent output changes caused by locale settings on the system where this script is running
+        putenv(sprintf('LANGUAGE=%s', 'en_US'));
 
         foreach ($vendorDirs as $vendorDir) {
             if (! $vendorDir->isDir()) {
@@ -168,7 +172,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         $escapes = array_values(array_unique(array_merge($requiringSignature, $requiringVerification)));
 
-        putenv(sprintf('LANGUAGE=%s', escapeshellarg((string) $originalLanguage)));
+        putenv(sprintf('LANGUAGE=%s', (string) $originalLanguage));
 
         if (! $escapes) {
             return;

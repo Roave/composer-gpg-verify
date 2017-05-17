@@ -7,7 +7,9 @@ namespace Roave\ComposerGpgVerify;
 use Composer\Composer;
 use Composer\Config;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
@@ -57,81 +59,13 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         // prevent output changes caused by locale settings on the system where this script is running
         putenv(sprintf('LANGUAGE=%s', 'en_US'));
 
-        $checkedPackages     = [];
-        $packages            = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
         $installationManager = $composer->getInstallationManager();
-
-        foreach ($packages as $package) {
-            $packageName      = $package->getName();
-            $packageDirectory = $installationManager->getInstallPath($package);
-
-            if (! is_dir($packageDirectory . '/.git')) {
-                $checkedPackages[$packageName] = [
-                    'git'       => false,
-                    'signed'    => false,
-                    'signature' => '',
-                    'verified'  => false,
-                ];
-
-                continue;
-            }
-
-            // because PHP is a moronic language, by-ref is everywhere in the standard library
-            $output = [];
-
-            // @TODO check check tags if the commit isn't signed
-            exec(
-                sprintf(
-                    'git --git-dir %s verify-commit --verbose HEAD 2>&1',
-                    escapeshellarg($packageDirectory . '/.git')
-                ),
-                $output,
-                $signed
-            );
-
-            $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($output);
-
-            if ($signed) {
-                // again, moronic language.
-                $tags = [];
-
-                exec(
-                    sprintf(
-                        'git --git-dir %s tag --points-at HEAD 2>&1',
-                        escapeshellarg($packageDirectory . '/.git')
-                    ),
-                    $tags
-                );
-
-                // go through all found tags, see if at least one is signed
-                foreach (array_filter($tags) as $tag) {
-                    exec(
-                        sprintf(
-                            'git --git-dir %s tag -v %s 2>&1',
-                            escapeshellarg($packageDirectory . '/.git'),
-                            escapeshellarg($tag)
-                        ),
-                        $tagSignatureOutput,
-                        $signed
-                    );
-
-                    $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($tagSignatureOutput);
-
-                    if (! $signed) {
-                        $output = array_merge($output, $tagSignatureOutput);
-
-                        break;
-                    }
-                }
-            }
-
-            $checkedPackages[$packageName] = [
-                'git'       => 'dunno',
-                'signed'    => (bool) $output,
-                'signature' => implode("\n", $output),
-                'verified'  => ! $signed,
-            ];
-        }
+        $checkedPackages     = array_map(
+            function (PackageInterface $package) use ($installationManager) {
+                return self::verifyPackage($installationManager, $package);
+            },
+            $composer->getRepositoryManager()->getLocalRepository()->getPackages()
+        );
 
         putenv(sprintf('LANGUAGE=%s', (string) $originalLanguage));
 
@@ -162,6 +96,79 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             "\n",
             implode("\n", $escapes)
         ));
+    }
+
+    private static function verifyPackage(InstallationManager $installationManager, PackageInterface $package) : array
+    {
+        $packageName      = $package->getName();
+        $packageDirectory = $installationManager->getInstallPath($package);
+
+        if (! is_dir($packageDirectory . '/.git')) {
+            return [
+                'name'      => $packageName,
+                'git'       => false,
+                'signed'    => false,
+                'signature' => '',
+                'verified'  => false,
+            ];
+        }
+
+        // because PHP is a moronic language, by-ref is everywhere in the standard library
+        $output = [];
+
+        // @TODO check check tags if the commit isn't signed
+        exec(
+            sprintf(
+                'git --git-dir %s verify-commit --verbose HEAD 2>&1',
+                escapeshellarg($packageDirectory . '/.git')
+            ),
+            $output,
+            $signed
+        );
+
+        $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($output);
+
+        if ($signed) {
+            // again, moronic language.
+            $tags = [];
+
+            exec(
+                sprintf(
+                    'git --git-dir %s tag --points-at HEAD 2>&1',
+                    escapeshellarg($packageDirectory . '/.git')
+                ),
+                $tags
+            );
+
+            // go through all found tags, see if at least one is signed
+            foreach (array_filter($tags) as $tag) {
+                exec(
+                    sprintf(
+                        'git --git-dir %s tag -v %s 2>&1',
+                        escapeshellarg($packageDirectory . '/.git'),
+                        escapeshellarg($tag)
+                    ),
+                    $tagSignatureOutput,
+                    $signed
+                );
+
+                $signed = $signed || ! self::verifySignatureValidationHasNoWarnings($tagSignatureOutput);
+
+                if (! $signed) {
+                    $output = array_merge($output, $tagSignatureOutput);
+
+                    break;
+                }
+            }
+        }
+
+        return [
+            'name'      => $packageName,
+            'git'       => 'dunno',
+            'signed'    => (bool) $output,
+            'signature' => implode("\n", $output),
+            'verified'  => ! $signed,
+        ];
     }
 
     /**

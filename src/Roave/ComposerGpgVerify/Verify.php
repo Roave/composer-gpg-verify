@@ -133,15 +133,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             ];
         }
 
-        // @TODO configuration WILL arrive, but for now I'm too lazy, so GTFO
-//        $settings = $composer->getPackage()->getExtra()['composer-gpg-verify'];
-//
-//        $allowedUnsigned  = $settings['allow-unsigned'];
-//        $allowedUntrusted = $settings['allow-untrusted'];
-
-        $allowedUnsigned  = [];
-        $allowedUntrusted = [];
-
+        putenv(sprintf('LANGUAGE=%s', (string) $originalLanguage));
 
         $unSigned = array_keys(array_filter(
             $checkedPackages,
@@ -157,12 +149,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             }
         ));
 
-        $requiringSignature    = array_diff($unSigned, $allowedUnsigned);
-        $requiringVerification = array_diff($unVerified, $allowedUntrusted);
-
-        $escapes = array_values(array_unique(array_merge($requiringSignature, $requiringVerification)));
-
-        putenv(sprintf('LANGUAGE=%s', (string) $originalLanguage));
+        $escapes = array_values(array_unique(array_merge($unSigned, $unVerified)));
 
         if (! $escapes) {
             return;

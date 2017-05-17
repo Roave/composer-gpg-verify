@@ -139,6 +139,38 @@ final class VerifyTest extends TestCase
         $this->assertWillFailPackageVerification();
     }
 
+    public function testWillRejectPackageSignedWithImportedButUnTrustedKeyWithDifferentLocaleSettings() : void
+    {
+        $personalGpgDirectory = $this->makeGpgHomeDirectory();
+        $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
+
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+        $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+
+        $this->importForeignKeys($personalGpgDirectory, $foreignGpgDirectory, $vendorKey, false);
+
+        $this->configureCorrectComposerSetup($vendorDir);
+
+        putenv('GNUPGHOME=' . $personalGpgDirectory);
+        putenv('LANGUAGE=de_DE');
+
+        try {
+            Verify::verify($this->event);
+        } catch (\RuntimeException $failure) {
+            self::assertSame('de_DE', getenv('LANGUAGE'));
+
+            return;
+        }
+
+        self::fail('Exception was not thrown');
+    }
+
     public function testWillAcceptPackageSignedWithImportedAndTrustedKey() : void
     {
         $personalGpgDirectory = $this->makeGpgHomeDirectory();

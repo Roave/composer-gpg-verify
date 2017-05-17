@@ -54,29 +54,19 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         self::assertSourceInstallation($config);
 
-        $vendorDir = $config->get('vendor-dir');
-
-        // @todo that `$vendorDir` may include special chars
-        /* @var $vendorDirs \GlobIterator|\SplFileInfo[]*/
-        $vendorDirs = new \GlobIterator(
-            $vendorDir . '/*/*',
-            \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO
-        );
-
-        $packages = [];
-
         // prevent output changes caused by locale settings on the system where this script is running
         putenv(sprintf('LANGUAGE=%s', 'en_US'));
 
-        foreach ($vendorDirs as $vendorDir) {
-            if (! $vendorDir->isDir()) {
-                continue;
-            }
+        $checkedPackages     = [];
+        $packages            = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $installationManager = $composer->getInstallationManager();
 
-            $packageName = basename(dirname($vendorDir->getRealPath())) . '/' . $vendorDir->getBasename();
+        foreach ($packages as $package) {
+            $packageName      = $package->getName();
+            $packageDirectory = $installationManager->getInstallPath($package);
 
-            if (! is_dir($vendorDir->getRealPath() . '/.git')) {
-                $packages[$packageName] = [
+            if (! is_dir($packageDirectory . '/.git')) {
+                $checkedPackages[$packageName] = [
                     'git'       => false,
                     'signed'    => false,
                     'signature' => '',
@@ -93,7 +83,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             exec(
                 sprintf(
                     'git --git-dir %s verify-commit --verbose HEAD 2>&1',
-                    escapeshellarg($vendorDir->getRealPath() . '/.git')
+                    escapeshellarg($packageDirectory . '/.git')
                 ),
                 $output,
                 $signed
@@ -108,7 +98,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 exec(
                     sprintf(
                         'git --git-dir %s tag --points-at HEAD 2>&1',
-                        escapeshellarg($vendorDir->getRealPath() . '/.git')
+                        escapeshellarg($packageDirectory . '/.git')
                     ),
                     $tags
                 );
@@ -118,7 +108,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                     exec(
                         sprintf(
                             'git --git-dir %s tag -v %s 2>&1',
-                            escapeshellarg($vendorDir->getRealPath() . '/.git'),
+                            escapeshellarg($packageDirectory . '/.git'),
                             escapeshellarg($tag)
                         ),
                         $tagSignatureOutput,
@@ -135,7 +125,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
                 }
             }
 
-            $packages[$packageName] = [
+            $checkedPackages[$packageName] = [
                 'git'       => 'dunno',
                 'signed'    => (bool) $output,
                 'signature' => implode("\n", $output),
@@ -154,14 +144,14 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
 
         $unSigned = array_keys(array_filter(
-            $packages,
+            $checkedPackages,
             function (array $package) : bool {
                 return ! $package['signed'];
             }
         ));
 
         $unVerified = array_keys(array_filter(
-            $packages,
+            $checkedPackages,
             function (array $package) : bool {
                 return ! $package['verified'];
             }

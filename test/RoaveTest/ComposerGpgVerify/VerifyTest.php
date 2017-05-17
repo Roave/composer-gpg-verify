@@ -6,6 +6,11 @@ namespace RoaveTest\ComposerGpgVerify;
 
 use Composer\Composer;
 use Composer\Config;
+use Composer\Installer\InstallationManager;
+use Composer\Package\Package;
+use Composer\Package\PackageInterface;
+use Composer\Repository\RepositoryInterface;
+use Composer\Repository\RepositoryManager;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +38,24 @@ final class VerifyTest extends TestCase
     private $config;
 
     /**
+     * @var RepositoryManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $repositoryManager;
+
+    /**
+     * @var InstallationManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $installationManager;
+
+    /**
+     * @var RepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $localRepository;
+//$composer->getRepositoryManager()->getLocalRepository()->getPackages();
+//    //$composer->getLocker()->getLockData()
+//$composer->getInstallationManager()->getInstallPath();
+
+    /**
      * @var string
      */
     private $originalGpgHome;
@@ -42,27 +65,63 @@ final class VerifyTest extends TestCase
      */
     private $originalLanguage;
 
+    /**
+     * @var PackageInterface[] indexed by installation path
+     */
+    private $installedPackages = [];
+
     protected function setUp() : void
     {
         parent::setUp();
 
-        $this->originalGpgHome  = (string) getenv('GNUPGHOME');
-        $this->originalLanguage = (string) getenv('LANGUAGE');
+        $this->installedPackages = [];
+        $this->originalGpgHome   = (string) getenv('GNUPGHOME');
+        $this->originalLanguage  = (string) getenv('LANGUAGE');
 
-        $this->event    = $this->createMock(Event::class);
-        $this->composer = $this->createMock(Composer::class);
-        $this->config   = $this->createMock(Config::class);
+        $this->event               = $this->createMock(Event::class);
+        $this->composer            = $this->createMock(Composer::class);
+        $this->config              = $this->createMock(Config::class);
+        $this->repositoryManager   = $this->createMock(RepositoryManager::class);
+        $this->installationManager = $this->createMock(InstallationManager::class);
+        $this->localRepository     = $this->createMock(RepositoryInterface::class);
 
         $this->event->expects(self::any())->method('getComposer')->willReturn($this->composer);
         $this->composer->expects(self::any())->method('getConfig')->willReturn($this->config);
-
-        // @TODO restore GNUPGHOME after test execution - back it up here, then reset later
+        $this
+            ->composer
+            ->expects(self::any())
+            ->method('getRepositoryManager')
+            ->willReturn($this->repositoryManager);
+        $this
+            ->composer
+            ->expects(self::any())
+            ->method('getInstallationManager')
+            ->willReturn($this->installationManager);
+        $this
+            ->repositoryManager
+            ->expects(self::any())
+            ->method('getLocalRepository')
+            ->willReturn($this->localRepository);
+        $this
+            ->installationManager
+            ->expects(self::any())
+            ->method('getInstallPath')
+            ->willReturnCallback(function (PackageInterface $package) : string {
+                return array_search($package, $this->installedPackages, true);
+            });
+        $this
+            ->localRepository
+            ->expects(self::any())
+            ->method('getPackages')
+            ->willReturnCallback(function () {
+                return array_values($this->installedPackages);
+            });
     }
 
     protected function tearDown() : void
     {
-        putenv(sprintf('GNUPGHOME=%s', escapeshellarg($this->originalGpgHome)));
-        putenv(sprintf('LANGUAGE=%s', escapeshellarg($this->originalLanguage)));
+        putenv(sprintf('GNUPGHOME=%s', $this->originalGpgHome));
+        putenv(sprintf('LANGUAGE=%s', $this->originalLanguage));
 
         parent::tearDown();
     }
@@ -109,7 +168,7 @@ final class VerifyTest extends TestCase
 
         $this->signDependency($vendor1, $gpgHomeDirectory, $vendorKey);
 
-        $this->configureCorrectComposerSetup($vendorDir);
+        $this->configureCorrectComposerSetup();
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
@@ -368,6 +427,12 @@ final class VerifyTest extends TestCase
             ->setTimeout(30)
             ->mustRun();
 
+        $package = $this->createMock(PackageInterface::class);
+
+        $package->expects(self::any())->method('getName')->willReturn($packageName);
+
+        $this->installedPackages[$dependencyRepository] = $package;
+
         return $dependencyRepository;
     }
 
@@ -419,20 +484,14 @@ KEY;
         return $matches[1];
     }
 
-    private function configureCorrectComposerSetup(string $vendorDirectory) : void
+    private function configureCorrectComposerSetup() : void
     {
         $this
             ->config
             ->expects(self::any())
             ->method('get')
-            ->with(self::logicalOr('preferred-install', 'vendor-dir'))
-            ->willReturnCallback(function (string $key) use ($vendorDirectory) {
-                if ('preferred-install' === $key) {
-                    return 'source';
-                }
-
-                return $vendorDirectory;
-            });
+            ->with('preferred-install')
+            ->willReturn('source');
     }
 
     private function assertWillFailPackageVerification(string ...$packages) : void

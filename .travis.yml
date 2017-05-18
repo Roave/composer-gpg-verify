@@ -15,6 +15,7 @@ before_install:
   - sudo add-apt-repository ppa:git-core/ppa -y
   - sudo apt-get update -q
   - sudo apt-get install -y --only-upgrade git
+  - git fetch --unshallow
   - git fetch --all
 
 before_script:

@@ -61,23 +61,10 @@ class GitSignatureCheck
      */
     private $signatureAuthor;
 
-    public function asHumanReadableString() : string
-    {
-        return implode(
-            "\n",
-            [
-                (($this->isSigned || $this->signatureKey) ? '[SIGNED]' : '[NOT SIGNED]')
-                . ' ' . ($this->isVerified ? '[VERIFIED]' : '[NOT VERIFIED]')
-                . ' ' . ($this->commitHash ? 'Commit #' . $this->commitHash : '')
-                . ' ' . ($this->tagName ? 'Tag ' . $this->tagName : '')
-                . ' ' . ($this->signatureAuthor ? 'By "' . $this->signatureAuthor . '"' : '')
-                . ' ' . ($this->signatureKey ? '(Key ' . $this->signatureKey . ')' : ''),
-                'Command: ' . $this->command,
-                'Exit code: ' . $this->exitCode,
-                'Output: ' . $this->output,
-            ]
-        );
-    }
+    /**
+     * @var string|null
+     */
+    private $signatureKey;
 
     private function __construct(
         string $packageName,
@@ -102,11 +89,6 @@ class GitSignatureCheck
         $this->signatureAuthor = $signatureAuthor;
         $this->signatureKey    = $signatureKey;
     }
-
-    /**
-     * @var string|null
-     */
-    private $signatureKey;
 
     public static function fromGitCommitCheck(
         PackageInterface $package,
@@ -151,6 +133,24 @@ class GitSignatureCheck
             $signed && self::signatureValidationHasNoWarnings($output),
             self::extractSignatureAuthor($output),
             self::extractKeyIdentifier($output)
+        );
+    }
+
+    public function asHumanReadableString() : string
+    {
+        return implode(
+            "\n",
+            [
+                (($this->isSigned || $this->signatureKey) ? '[SIGNED]' : '[NOT SIGNED]')
+                . ' ' . ($this->isVerified ? '[VERIFIED]' : '[NOT VERIFIED]')
+                . ' ' . ($this->commitHash ? 'Commit #' . $this->commitHash : '')
+                . ' ' . ($this->tagName ? 'Tag ' . $this->tagName : '')
+                . ' ' . ($this->signatureAuthor ? 'By "' . $this->signatureAuthor . '"' : '')
+                . ' ' . ($this->signatureKey ? '(Key ' . $this->signatureKey . ')' : ''),
+                'Command: ' . $this->command,
+                'Exit code: ' . $this->exitCode,
+                'Output: ' . $this->output,
+            ]
         );
     }
 

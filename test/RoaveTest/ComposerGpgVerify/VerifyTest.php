@@ -382,6 +382,28 @@ final class VerifyTest extends TestCase
         $this->assertWillFailPackageVerification();
     }
 
+    public function testWillOnlyConsiderTheHeadCommitForValidation() : void
+    {
+        $gpgHome     = $this->makeGpgHomeDirectory();
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorKey   = $this->makeKey($gpgHome, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $gpgHome, $vendorKey);
+
+        (new Process('git commit --allow-empty -m "unsigned commit"', $vendor1))
+            ->setTimeout(30)
+            ->mustRun();
+
+        $this->configureCorrectComposerSetup();
+
+        putenv('GNUPGHOME=' . $gpgHome);
+
+        $this->assertWillFailPackageVerification();
+    }
+
     public function testWillRejectSignedCommitsFromUnknownKeys() : void
     {
         $personalGpgDirectory = $this->makeGpgHomeDirectory();

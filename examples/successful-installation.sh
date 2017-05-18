@@ -4,7 +4,7 @@ set -xeuo pipefail
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 LIBRARY_COMMIT="$( git rev-parse HEAD )"
-BRANCH="$( git rev-parse --abbrev-ref HEAD )"
+BRANCH="$( git branch --contains HEAD | head -n 1 | cut -d' ' -f2)" # if you are in detached head, this is kinda safe
 
 echo "First, we will work in a temporary directory"
 BASEDIR="$( mktemp -d )"

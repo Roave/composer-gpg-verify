@@ -22,13 +22,6 @@ use Roave\ComposerGpgVerify\Package\UnknownPackageFormat;
 final class Verify implements PluginInterface, EventSubscriberInterface
 {
     /**
-     * @codeCoverageIgnore
-     */
-    private function __construct()
-    {
-    }
-
-    /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents() : array

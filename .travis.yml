@@ -14,7 +14,7 @@ before_script:
 
 script:
   - ./vendor/bin/phpunit --disallow-test-output --report-useless-tests --coverage-clover ./clover.xml
-  - ./vendor/bin/phpcs --standard=PSR2 ./src/ ./test/
+  - ./vendor/bin/phpcs --standard=./phpcs.xml.dist src test
   - ./vendor/bin/phpstan analyse -c phpstan.neon -l 7 src
   - ./vendor/bin/phpstan analyse -c phpstan.test.neon -l 5 test
   - ./vendor/bin/humbug

@@ -8,7 +8,6 @@ use Composer\Package\PackageInterface;
 use PHPUnit\Framework\TestCase;
 use Roave\ComposerGpgVerify\Package\Git\GitSignatureCheck;
 use Roave\ComposerGpgVerify\Package\GitPackage;
-use Roave\ComposerGpgVerify\Package\UnknownPackageFormat;
 
 /**
  * @covers \Roave\ComposerGpgVerify\Package\GitPackage

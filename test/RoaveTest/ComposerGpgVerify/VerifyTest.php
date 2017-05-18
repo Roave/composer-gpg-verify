@@ -13,6 +13,7 @@ use Composer\Repository\RepositoryManager;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use PHPUnit\Framework\TestCase;
+use Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed;
 use Roave\ComposerGpgVerify\Verify;
 use Symfony\Component\Process\Process;
 
@@ -220,7 +221,7 @@ final class VerifyTest extends TestCase
 
         try {
             Verify::verify($this->event);
-        } catch (\RuntimeException $failure) {
+        } catch (PackagesTrustCheckFailed $failure) {
             self::assertSame('de_DE', getenv('LANGUAGE'));
 
             return;
@@ -584,12 +585,7 @@ KEY;
 
     private function assertWillFailPackageVerification(string ...$packages) : void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            'The following packages need to be signed and verified, or added to exclusions: '
-            . "\n"
-            . implode("\n", $packages)
-        );
+        $this->expectException(PackagesTrustCheckFailed::class);
 
         Verify::verify($this->event);
     }

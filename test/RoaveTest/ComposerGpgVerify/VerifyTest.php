@@ -7,6 +7,7 @@ namespace RoaveTest\ComposerGpgVerify;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Installer\InstallationManager;
+use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Repository\RepositoryManager;
@@ -32,6 +33,11 @@ final class VerifyTest extends TestCase
      * @var Composer|\PHPUnit_Framework_MockObject_MockObject
      */
     private $composer;
+
+    /**
+     * @var IOInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $io;
 
     /**
      * @var Config|\PHPUnit_Framework_MockObject_MockObject
@@ -78,12 +84,14 @@ final class VerifyTest extends TestCase
 
         $this->event               = $this->createMock(Event::class);
         $this->composer            = $this->createMock(Composer::class);
+        $this->io                  = $this->createMock(IOInterface::class);
         $this->config              = $this->createMock(Config::class);
         $this->repositoryManager   = $this->createMock(RepositoryManager::class);
         $this->installationManager = $this->createMock(InstallationManager::class);
         $this->localRepository     = $this->createMock(RepositoryInterface::class);
 
         $this->event->expects(self::any())->method('getComposer')->willReturn($this->composer);
+        $this->event->expects(self::any())->method('getIO')->willReturn($this->io);
         $this->composer->expects(self::any())->method('getConfig')->willReturn($this->config);
         $this
             ->composer
@@ -169,7 +177,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
-        Verify::verify($this->event);
+        $this->assertWillSucceedPackageVerification();
     }
 
     public function testWillRejectPackageSignedWithImportedButUnTrustedKey() : void
@@ -251,7 +259,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
-        Verify::verify($this->event);
+        $this->assertWillSucceedPackageVerification();
     }
 
     public function testWillRejectPackageTaggedAndSignedWithImportedButUnTrustedKey() : void
@@ -299,7 +307,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $personalGpgDirectory);
 
-        Verify::verify($this->event);
+        $this->assertWillSucceedPackageVerification();
     }
 
     public function testWillAcceptSignedAndTrustedTaggedPackages() : void
@@ -318,7 +326,7 @@ final class VerifyTest extends TestCase
 
         putenv('GNUPGHOME=' . $gpgHomeDirectory);
 
-        Verify::verify($this->event);
+        $this->assertWillSucceedPackageVerification();
     }
 
     public function testWillRejectUnSignedCommits() : void
@@ -583,8 +591,28 @@ KEY;
             ->willReturn('source');
     }
 
-    private function assertWillFailPackageVerification(string ...$packages) : void
+    private function assertWillSucceedPackageVerification() : void
     {
+        $this
+            ->io
+            ->expects(self::exactly(2))
+            ->method('write')
+            ->with(self::logicalOr(
+                '<info>roave/composer-gpg-verify:</info>  Analysing downloaded packages...',
+                '<info>roave/composer-gpg-verify:</info>  All installed packages passed GPG validation!'
+            ));
+
+        Verify::verify($this->event);
+    }
+
+    private function assertWillFailPackageVerification() : void
+    {
+        $this
+            ->io
+            ->expects(self::once())
+            ->method('write')
+            ->with(self::logicalOr('<info>roave/composer-gpg-verify:</info>  Analysing downloaded packages...'));
+
         $this->expectException(PackagesTrustCheckFailed::class);
 
         Verify::verify($this->event);

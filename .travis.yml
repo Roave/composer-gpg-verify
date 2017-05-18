@@ -1,0 +1,36 @@
+dist: trusty
+
+language: php
+
+php:
+  - 7.1
+  - nightly
+
+env:
+  matrix:
+    - DEPENDENCIES="high"
+    - DEPENDENCIES="low"
+
+before_install:
+  - sudo add-apt-repository ppa:git-core/ppa -y
+  - sudo apt-get update -q
+  - sudo apt-get install -y --only-upgrade git
+  - git fetch --all
+
+before_script:
+  - sh .travis.install.sh
+
+script:
+  - ./vendor/bin/phpunit --coverage-clover ./clover.xml
+  - ./vendor/bin/phpcs --standard=./phpcs.xml.dist src test
+  - ./vendor/bin/phpstan analyse -c phpstan.neon -l 7 src
+  - ./vendor/bin/phpstan analyse -c phpstan.test.neon -l 5 test
+  - ./vendor/bin/humbug
+  - ./examples/successful-installation.sh
+
+matrix:
+  allow_failures:
+    - php: nightly
+
+after_script:
+  - sh .travis.coverage.sh

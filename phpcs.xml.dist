@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ruleset
+    name="PSR2 without line length limit"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd"
+>
+    <description>My custom coding standard.</description>
+    <rule ref="PSR2" />
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="180"/>
+        </properties>
+    </rule>
+</ruleset>

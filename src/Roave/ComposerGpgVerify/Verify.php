@@ -155,7 +155,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
      * @param PackageInterface $package
      * @param string[]         $tags
      *
-     * @return array|GitSignatureCheck[]
+     * @return GitSignatureCheck[]
      */
     private static function checkTagSignatures(string $gitDirectory, PackageInterface $package, string ...$tags) : array
     {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
+set -xeu
 IFS=$'\n\t'
 
 if [ "$TRAVIS_PHP_VERSION" = '7.1' ] ; then

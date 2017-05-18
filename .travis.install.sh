@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
+set -xeu
 IFS=$'\n\t'
 
 composer self-update

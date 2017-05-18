@@ -4,11 +4,10 @@ set -xeuo pipefail
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 LIBRARY_COMMIT="$( git rev-parse HEAD )"
-BRANCH="$( git branch --contains HEAD | head -n 1 | cut -d' ' -f2)" # if you are in detached head, this is kinda safe
+BRANCH=${TRAVIS_BRANCH:-"$( git branch --contains HEAD | head -n 1 | cut -d' ' -f2)"}
 
 echo "First, we will work in a temporary directory"
 BASEDIR="$( mktemp -d )"
-export COMPOSER_HOME="$BASEDIR"
 
 echo "Let's not mess with your system's GPG environment :-)"
 export GNUPGHOME="$BASEDIR/gnupg-home"

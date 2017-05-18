@@ -60,7 +60,7 @@ REASON
         );
     }
 
-    public function testWillReportSuccessfulVerificationWithMultiplePackages() : void
+    public function testWillReportSuccessfulVerificationWithMultipleChecks() : void
     {
         $verification = GitPackage::fromPackageAndSignatureChecks(
             $this->package,
@@ -82,6 +82,57 @@ yadda
 dadda
 
 wadda
+REASON
+            ,
+            $verification->printReason()
+        );
+    }
+
+    public function testWillReportFailedVerification() : void
+    {
+        $verification = GitPackage::fromPackageAndSignatureChecks(
+            $this->package,
+            $this->makeSignatureCheck(false, 'yadda')
+        );
+
+        self::assertInstanceOf(GitPackage::class, $verification);
+        self::assertSame($this->packageName, $verification->packageName());
+        self::assertFalse($verification->isVerified());
+        self::assertSame(
+            <<<REASON
+The following GIT GPG signature checks have failed for package "{$this->packageName}":
+
+yadda
+REASON
+            ,
+            $verification->printReason()
+        );
+    }
+
+    public function testWillReportFailedVerificationWithMultipleChecks() : void
+    {
+        $verification = GitPackage::fromPackageAndSignatureChecks(
+            $this->package,
+            $this->makeSignatureCheck(false, 'yadda'),
+            $this->makeSignatureCheck(false, 'dadda'),
+            $this->makeSignatureCheck(false, 'wadda'),
+            $this->makeSignatureCheck(false, 'nope')
+        );
+
+        self::assertInstanceOf(GitPackage::class, $verification);
+        self::assertSame($this->packageName, $verification->packageName());
+        self::assertFalse($verification->isVerified());
+        self::assertSame(
+            <<<REASON
+The following GIT GPG signature checks have failed for package "{$this->packageName}":
+
+yadda
+
+dadda
+
+wadda
+
+nope
 REASON
             ,
             $verification->printReason()

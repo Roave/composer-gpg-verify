@@ -251,7 +251,7 @@ READABLE
             'failed verification - signed tag, untrusted key' => [
                 $package,
                 'git tag -v tag-name',
-                1,
+                0,
                 <<<'OUTPUT'
 object be3b7a6f0ee4d90a72e1e1a19f89d8eeef746200
 type commit
@@ -274,7 +274,7 @@ OUTPUT
                 <<<'READABLE'
 [SIGNED] [NOT VERIFIED] Commit #be3b7a6f0ee4d90a72e1e1a19f89d8eeef746200 Tag tag-name By "Mr. Magoo <magoo@example.com>" (Key 865E20A60B500B00)
 Command: git tag -v tag-name
-Exit code: 1
+Exit code: 0
 Output: object be3b7a6f0ee4d90a72e1e1a19f89d8eeef746200
 type commit
 tag tag-name
@@ -290,6 +290,38 @@ gpg: Good signature from "Mr. Magoo <magoo@example.com>" [unknown]
 gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: D8BE 3E96 4271 2378 9551  AF87 865E 20A6 0B50 0B00
+READABLE
+            ],
+            'successful verification' => [
+                $package,
+                'git tag -v tag-name',
+                0,
+                <<<'OUTPUT'
+object 99498872c90de4d40b2fcafad7bd1bb2cbd0433a
+type commit
+tag tag-name
+tagger Mr. Magoo <magoo@example.com> 1495095451 +0200
+
+signed tag
+gpg: Signature made Do 18 Mai 2017 10:17:31 CEST
+gpg:                using RSA key E9AE0662BC840E1F
+gpg: Good signature from "Mr. Magoo <magoo@example.com>" [full]
+OUTPUT
+                ,
+                true,
+                <<<'READABLE'
+[SIGNED] [VERIFIED] Commit #99498872c90de4d40b2fcafad7bd1bb2cbd0433a Tag tag-name By "Mr. Magoo <magoo@example.com>" (Key E9AE0662BC840E1F)
+Command: git tag -v tag-name
+Exit code: 0
+Output: object 99498872c90de4d40b2fcafad7bd1bb2cbd0433a
+type commit
+tag tag-name
+tagger Mr. Magoo <magoo@example.com> 1495095451 +0200
+
+signed tag
+gpg: Signature made Do 18 Mai 2017 10:17:31 CEST
+gpg:                using RSA key E9AE0662BC840E1F
+gpg: Good signature from "Mr. Magoo <magoo@example.com>" [full]
 READABLE
             ],
         ];

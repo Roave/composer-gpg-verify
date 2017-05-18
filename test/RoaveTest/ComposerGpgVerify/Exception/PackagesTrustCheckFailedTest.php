@@ -34,4 +34,39 @@ EXPECTED
             $exception->getMessage()
         );
     }
+
+    public function testFromFailedPackageVerificationsWithMultiplePackages() : void
+    {
+        /* @var $verification1 PackageVerification|\PHPUnit_Framework_MockObject_MockObject */
+        $verification1 = $this->createMock(PackageVerification::class);
+        /* @var $verification2 PackageVerification|\PHPUnit_Framework_MockObject_MockObject */
+        $verification2 = $this->createMock(PackageVerification::class);
+        /* @var $verification3 PackageVerification|\PHPUnit_Framework_MockObject_MockObject */
+        $verification3 = $this->createMock(PackageVerification::class);
+
+        $verification1->expects(self::any())->method('printReason')->willReturn('foo');
+        $verification2->expects(self::any())->method('printReason')->willReturn('bar');
+        $verification3->expects(self::any())->method('printReason')->willReturn('baz');
+
+        $exception = PackagesTrustCheckFailed::fromFailedPackageVerifications(
+            $verification1,
+            $verification2,
+            $verification3
+        );
+
+        self::assertInstanceOf(PackagesTrustCheckFailed::class, $exception);
+        self::assertInstanceOf(LogicException::class, $exception);
+        self::assertSame(
+            <<<'EXPECTED'
+The following packages need to be signed and verified, or added to exclusions: 
+foo
+
+bar
+
+baz
+EXPECTED
+            ,
+            $exception->getMessage()
+        );
+    }
 }

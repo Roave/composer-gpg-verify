@@ -201,6 +201,19 @@ Exit code: 0
 Output: 
 READABLE
             ],
+            'failed verification - no signed tag' => [
+                $package,
+                'git tag -v --verbose unsigned-tag',
+                1,
+                '',
+                false,
+                <<<'READABLE'
+[NOT SIGNED] [NOT VERIFIED]    
+Command: git tag -v --verbose unsigned-tag
+Exit code: 1
+Output: 
+READABLE
+            ],
         ];
     }
 }

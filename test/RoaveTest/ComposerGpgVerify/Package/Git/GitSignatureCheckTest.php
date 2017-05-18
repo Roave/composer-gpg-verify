@@ -214,6 +214,40 @@ Exit code: 1
 Output: 
 READABLE
             ],
+            'failed verification - signed tag, unknown key' => [
+                $package,
+                'git tag -v tag-name',
+                1,
+                <<<'OUTPUT'
+object bf2fabeabe00f14f0ce0090adc7a2b9b770edbe3
+type commit
+tag tag-name
+tagger Mr. Magoo <magoo@example.com> 1495094925 +0200
+
+signed tag
+gpg: keybox '/tmp/gpg-verification-test591d568c5d0947.51554486//pubring.kbx' created
+gpg: Signature made Do 18 Mai 2017 10:08:45 CEST
+gpg:                using RSA key 4B95C0CE4DE340CC
+gpg: Can't check signature: No public key
+OUTPUT
+,
+                false,
+                <<<'READABLE'
+[SIGNED] [NOT VERIFIED] Commit #bf2fabeabe00f14f0ce0090adc7a2b9b770edbe3 Tag tag-name  (Key 4B95C0CE4DE340CC)
+Command: git tag -v tag-name
+Exit code: 1
+Output: object bf2fabeabe00f14f0ce0090adc7a2b9b770edbe3
+type commit
+tag tag-name
+tagger Mr. Magoo <magoo@example.com> 1495094925 +0200
+
+signed tag
+gpg: keybox '/tmp/gpg-verification-test591d568c5d0947.51554486//pubring.kbx' created
+gpg: Signature made Do 18 Mai 2017 10:08:45 CEST
+gpg:                using RSA key 4B95C0CE4DE340CC
+gpg: Can't check signature: No public key
+READABLE
+            ],
         ];
     }
 }

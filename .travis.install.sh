@@ -5,8 +5,8 @@ IFS=$'\n\t'
 
 composer self-update
 composer clear-cache
-composer update
+composer update --no-scripts
 
 if [ "$DEPENDENCIES" = 'low' ] ; then
-    composer update --prefer-lowest --prefer-stable
+    composer update --prefer-lowest --prefer-stable --no-scripts
 fi

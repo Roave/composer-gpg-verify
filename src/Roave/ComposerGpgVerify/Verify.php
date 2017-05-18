@@ -123,16 +123,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         $checks[] = GitSignatureCheck::fromGitCommitCheck($package, $command, $exitCode, implode("\n", $output));
 
-        exec(
-            sprintf(
-                'git --git-dir %s tag --points-at HEAD 2>&1',
-                escapeshellarg($gitDirectory)
-            ),
-            $tags
-        );
-
         // go through all found tags, see if at least one is signed
-        foreach (array_filter($tags) as $tag) {
+        foreach (self::getTagsForCurrentCommit($gitDirectory) as $tag) {
             $command = sprintf(
                 'git --git-dir %s tag -v %s 2>&1',
                 escapeshellarg($gitDirectory),
@@ -151,6 +143,25 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         return GitPackage::fromPackageAndSignatureChecks($package, ...$checks);
     }
+
+    /**
+     * @param string $gitDirectory
+     *
+     * @return string[]
+     */
+    private static function getTagsForCurrentCommit(string $gitDirectory) : array
+    {
+        exec(
+            sprintf(
+                'git --git-dir %s tag --points-at HEAD 2>&1',
+                escapeshellarg($gitDirectory)
+            ),
+            $tags
+        );
+
+        return array_filter($tags);
+    }
+
 
     /**
      * @param Config $config

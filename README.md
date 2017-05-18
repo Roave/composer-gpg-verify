@@ -1,5 +1,8 @@
 ## Composer GPG signature verification plugin
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/?branch=master)
+
 This package provides pluggable composer tag signature verification.
 
 Specifically, all this package does is stop the installation process

@@ -139,6 +139,30 @@ REASON
         );
     }
 
+    public function testWillReportSuccessfulVerificationWithMultipleChecksAndSuccessfulOneNotFirst() : void
+    {
+        $verification = GitPackage::fromPackageAndSignatureChecks(
+            $this->package,
+            $this->makeSignatureCheck(false, 'yadda'),
+            $this->makeSignatureCheck(false, 'dadda'),
+            $this->makeSignatureCheck(false, 'wadda'),
+            $this->makeSignatureCheck(true, 'yarp')
+        );
+
+        self::assertInstanceOf(GitPackage::class, $verification);
+        self::assertSame($this->packageName, $verification->packageName());
+        self::assertTrue($verification->isVerified());
+        self::assertSame(
+            <<<REASON
+The following GIT GPG signature checks passed for package "{$this->packageName}":
+
+yarp
+REASON
+            ,
+            $verification->printReason()
+        );
+    }
+
     private function makeSignatureCheck(bool $passed, string $reasoning) : GitSignatureCheck
     {
         /* @var $verification GitSignatureCheck|\PHPUnit_Framework_MockObject_MockObject */

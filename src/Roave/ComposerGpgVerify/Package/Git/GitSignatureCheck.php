@@ -14,7 +14,7 @@ use Composer\Package\PackageInterface;
  *
  * @link https://stackoverflow.com/questions/17371955/verifying-signed-git-commits/32038784#32038784
  */
-final class GitSignatureCheck
+class GitSignatureCheck
 {
     /**
      * @var string

@@ -60,6 +60,34 @@ REASON
         );
     }
 
+    public function testWillReportSuccessfulVerificationWithMultiplePackages() : void
+    {
+        $verification = GitPackage::fromPackageAndSignatureChecks(
+            $this->package,
+            $this->makeSignatureCheck(true, 'yadda'),
+            $this->makeSignatureCheck(true, 'dadda'),
+            $this->makeSignatureCheck(true, 'wadda'),
+            $this->makeSignatureCheck(false, 'nope')
+        );
+
+        self::assertInstanceOf(GitPackage::class, $verification);
+        self::assertSame($this->packageName, $verification->packageName());
+        self::assertTrue($verification->isVerified());
+        self::assertSame(
+            <<<REASON
+The following GIT GPG signature checks passed for package "{$this->packageName}":
+
+yadda
+
+dadda
+
+wadda
+REASON
+            ,
+            $verification->printReason()
+        );
+    }
+
     private function makeSignatureCheck(bool $passed, string $reasoning) : GitSignatureCheck
     {
         /* @var $verification GitSignatureCheck|\PHPUnit_Framework_MockObject_MockObject */

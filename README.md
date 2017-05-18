@@ -149,3 +149,16 @@ resume your composer installation or upgrade process.
 Please refer to the [examples](examples) directory for running
 examples in your system. All examples are designed in a way that
 will leave your current GPG settings untouched.
+
+## Limitations
+
+This package still has few serious limitations:
+
+ * it needs `gpg` `2.x` to run - this means that you should probably
+   be on Ubuntu 16.04 or equivalent.
+ * it needs `gpg` `2.x`
+ * it can only verify signatures of downloaded GIT repositories: any
+   non-git packages will cause the validation to fail
+
+These limitations will eventually be softened as development of
+further versions of the library continues.

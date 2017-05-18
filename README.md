@@ -143,3 +143,9 @@ gpg --sign-key AABBCCDDEEFF1122
 
 Once you did any of the above (signing or trusting), then you may
 resume your composer installation or upgrade process.
+
+## Examples
+
+Please refer to the [examples](examples) directory for running
+examples in your system. All examples are designed in a way that
+will leave your current GPG settings untouched.

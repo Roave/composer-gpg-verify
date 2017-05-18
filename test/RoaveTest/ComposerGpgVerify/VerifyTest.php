@@ -358,7 +358,26 @@ final class VerifyTest extends TestCase
         $this->assertWillFailPackageVerification();
     }
 
-    public function testWillRejectSignedCommitsFromUntrustedKeys() : void
+    public function testWillRejectSignedTagsFromUnknownKey() : void
+    {
+        $personalGpgDirectory = $this->makeGpgHomeDirectory();
+        $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+
+        $this->configureCorrectComposerSetup();
+
+        putenv('GNUPGHOME=' . $personalGpgDirectory);
+
+        $this->assertWillFailPackageVerification();
+    }
+
+    public function testWillRejectSignedCommitsFromUnknownKeys() : void
     {
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();

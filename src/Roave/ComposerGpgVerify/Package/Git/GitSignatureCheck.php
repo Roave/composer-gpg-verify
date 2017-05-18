@@ -78,7 +78,7 @@ class GitSignatureCheck
         ?string $signatureAuthor,
         ?string $signatureKey
     ) {
-        $this->packageName     = $packageName;
+        $this->packageName     = $packageName; // @TODO get rid of this, or add it to the error messages
         $this->commitHash      = $commitHash;
         $this->tagName         = $tagName;
         $this->command         = $command;

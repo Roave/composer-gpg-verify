@@ -52,8 +52,11 @@ final class Verify implements PluginInterface, EventSubscriberInterface
     public static function verify(Event $composerEvent) : void
     {
         $originalLanguage = getenv('LANGUAGE');
+        $io               = $composerEvent->getIO();
         $composer         = $composerEvent->getComposer();
         $config           = $composer->getConfig();
+
+        $io->write('<info>roave/composer-gpg-verify:</info>  Analysing downloaded packages...');
 
         self::assertSourceInstallation($config);
 
@@ -79,6 +82,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         );
 
         if (! $escapes) {
+            $io->write('<info>roave/composer-gpg-verify:</info>  All installed packages passed GPG validation!');
+
             return;
         }
 

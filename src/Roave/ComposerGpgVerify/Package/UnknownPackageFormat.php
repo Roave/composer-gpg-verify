@@ -8,6 +8,9 @@ use Composer\Package\PackageInterface;
 
 /**
  * @internal do not use: I will cut you.
+ *
+ * This class represents a package verification for an unknown package type.
+ * Currently, this repository only knows how to verify GPG+GIT, so anything ZIP/HG/CVS/etc will be considered "unknown"
  */
 final class UnknownPackageFormat implements PackageVerification
 {

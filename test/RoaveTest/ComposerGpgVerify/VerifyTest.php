@@ -368,7 +368,7 @@ final class VerifyTest extends TestCase
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
 
-        $this->signDependency($vendor1, $foreignGpgDirectory, $vendorKey);
+        $this->createDependencySignedTag($vendor1, $foreignGpgDirectory, $vendorKey);
 
         $this->configureCorrectComposerSetup();
 

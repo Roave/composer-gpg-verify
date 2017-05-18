@@ -14,6 +14,7 @@ use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use PHPUnit\Framework\TestCase;
 use Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed;
+use Roave\ComposerGpgVerify\Exception\PreferredInstallIsNotSource;
 use Roave\ComposerGpgVerify\Verify;
 use Symfony\Component\Process\Process;
 
@@ -132,8 +133,7 @@ final class VerifyTest extends TestCase
             ->with('preferred-install')
             ->willReturn('foo');
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Expected installation "preferred-install" to be "source", found "foo" instead');
+        $this->expectException(PreferredInstallIsNotSource::class);
 
         Verify::verify($this->event);
     }

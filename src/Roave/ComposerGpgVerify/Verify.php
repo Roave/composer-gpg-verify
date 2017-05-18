@@ -110,8 +110,17 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             return UnknownPackageFormat::fromNonGitPackage($package);
         }
 
-        // because PHP is a moronic language, by-ref is everywhere in the standard library
-        $output  = [];
+        return GitPackage::fromPackageAndSignatureChecks(
+            $package,
+            self::checkCurrentCommitSignature($gitDirectory, $package),
+            ...self::checkTagSignatures($gitDirectory, $package, ...self::getTagsForCurrentCommit($gitDirectory))
+        );
+    }
+
+    private static function checkCurrentCommitSignature(
+        string $gitDirectory,
+        PackageInterface $package
+    ) : GitSignatureCheck {
         $command = sprintf(
             'git --git-dir %s verify-commit --verbose HEAD 2>&1',
             escapeshellarg($gitDirectory)
@@ -119,11 +128,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         exec($command, $output, $exitCode);
 
-        return GitPackage::fromPackageAndSignatureChecks(
-            $package,
-            GitSignatureCheck::fromGitCommitCheck($package, $command, $exitCode, implode("\n", $output)),
-            ...self::checkTagSignatures($gitDirectory, $package, ...self::getTagsForCurrentCommit($gitDirectory))
-        );
+        return GitSignatureCheck::fromGitCommitCheck($package, $command, $exitCode, implode("\n", $output));
     }
 
     /**

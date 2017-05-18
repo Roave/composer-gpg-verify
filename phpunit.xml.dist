@@ -4,15 +4,10 @@
     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
     bootstrap="./vendor/autoload.php"
     colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
+    beStrictAboutOutputDuringTests="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
     verbose="true"
-    stopOnFailure="false"
-    processIsolation="false"
     backupGlobals="false"
-    syntaxCheck="true"
-    columns="max"
 >
     <testsuite name="Roave\ComposerGpgVerify tests">
         <directory>./test/RoaveTest</directory>

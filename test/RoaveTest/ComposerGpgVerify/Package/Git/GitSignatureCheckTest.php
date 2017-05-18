@@ -162,4 +162,45 @@ READABLE
             ],
         ];
     }
+
+    /**
+     * @dataProvider tagDataProvider
+     */
+    public function testFromGitTagCheck(
+        PackageInterface $package,
+        string $command,
+        int $exitCode,
+        string $commandOutput,
+        bool $expectedTrust,
+        string $expectedHumanReadableStringFormat
+    ) : void {
+        $check = GitSignatureCheck::fromGitTagCheck($package, $command, $exitCode, $commandOutput);
+
+        self::assertSame($expectedTrust, $check->canBeTrusted());
+        self::assertStringMatchesFormat($expectedHumanReadableStringFormat, $check->asHumanReadableString());
+    }
+
+    public function tagDataProvider() : array
+    {
+        $packageName = uniqid('packageName', true);
+        $package = $this->createMock(PackageInterface::class);
+
+        $package->expects(self::any())->method('getName')->willReturn($packageName);
+
+        return [
+            'empty' => [
+                $package,
+                '',
+                0,
+                '',
+                false,
+                <<<'READABLE'
+[NOT SIGNED] [NOT VERIFIED]    
+Command: 
+Exit code: 0
+Output: 
+READABLE
+            ],
+        ];
+    }
 }

@@ -112,8 +112,6 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         // because PHP is a moronic language, by-ref is everywhere in the standard library
         $output  = [];
-        /* @var $checks GitSignatureCheck[] */
-        $checks  = [];
         $command = sprintf(
             'git --git-dir %s verify-commit --verbose HEAD 2>&1',
             escapeshellarg($gitDirectory)
@@ -121,27 +119,11 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
         exec($command, $output, $exitCode);
 
-        $checks[] = GitSignatureCheck::fromGitCommitCheck($package, $command, $exitCode, implode("\n", $output));
-
-        // go through all found tags, see if at least one is signed
-        foreach (self::getTagsForCurrentCommit($gitDirectory) as $tag) {
-            $command = sprintf(
-                'git --git-dir %s tag -v %s 2>&1',
-                escapeshellarg($gitDirectory),
-                escapeshellarg($tag)
-            );
-
-            exec($command, $tagSignatureOutput, $exitCode);
-
-            $checks[] = GitSignatureCheck::fromGitTagCheck(
-                $package,
-                $command,
-                $exitCode,
-                implode("\n", $tagSignatureOutput)
-            );
-        }
-
-        return GitPackage::fromPackageAndSignatureChecks($package, ...$checks);
+        return GitPackage::fromPackageAndSignatureChecks(
+            $package,
+            GitSignatureCheck::fromGitCommitCheck($package, $command, $exitCode, implode("\n", $output)),
+            ...self::checkTagSignatures($gitDirectory, $package, ...self::getTagsForCurrentCommit($gitDirectory))
+        );
     }
 
     /**
@@ -159,9 +141,39 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             $tags
         );
 
-        return array_filter($tags);
+        return array_values(array_filter($tags));
     }
 
+
+    /**
+     * @param string           $gitDirectory
+     * @param PackageInterface $package
+     * @param string[]         $tags
+     *
+     * @return array|GitSignatureCheck[]
+     */
+    private static function checkTagSignatures(string $gitDirectory, PackageInterface $package, string ...$tags) : array
+    {
+        return array_map(
+            function (string $tag) use ($gitDirectory, $package) : GitSignatureCheck {
+                $command = sprintf(
+                    'git --git-dir %s tag -v %s 2>&1',
+                    escapeshellarg($gitDirectory),
+                    escapeshellarg($tag)
+                );
+
+                exec($command, $tagSignatureOutput, $exitCode);
+
+                return GitSignatureCheck::fromGitTagCheck(
+                    $package,
+                    $command,
+                    $exitCode,
+                    implode("\n", $tagSignatureOutput)
+                );
+            },
+            $tags
+        );
+    }
 
     /**
      * @param Config $config

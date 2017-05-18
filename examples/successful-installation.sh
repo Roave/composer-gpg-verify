@@ -47,4 +47,9 @@ JSON
 "$COMPOSER_PHAR" --working-dir="$BASEDIR" require ocramius/package-versions:1.1.2 --prefer-source
 
 # this commit is not signed - this command should fail
-"$COMPOSER_PHAR" --working-dir="$BASEDIR" require "ocramius/lazy-map:dev-master#5c77102e225d225ae2d74d5f2cc488527834b821" --prefer-source
+echo "The next command is supposed to fail - this is expected:"
+"$COMPOSER_PHAR" --working-dir="$BASEDIR" require "ocramius/lazy-map:dev-master#5c77102e225d225ae2d74d5f2cc488527834b821" --prefer-source || exit 0
+
+# this location should never be reached
+echo "Something went wrong - the last command should have failed"
+exit 1

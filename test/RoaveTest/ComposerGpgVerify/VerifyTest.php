@@ -7,7 +7,6 @@ namespace RoaveTest\ComposerGpgVerify;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Installer\InstallationManager;
-use Composer\Package\Package;
 use Composer\Package\PackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Repository\RepositoryManager;
@@ -180,9 +179,10 @@ final class VerifyTest extends TestCase
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
+        $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';
-        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
         $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
@@ -203,9 +203,11 @@ final class VerifyTest extends TestCase
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
+        $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';
-        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
@@ -235,9 +237,10 @@ final class VerifyTest extends TestCase
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
+        $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';
-        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
         $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
@@ -258,9 +261,10 @@ final class VerifyTest extends TestCase
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
+        $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';
-        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
         $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
@@ -281,9 +285,10 @@ final class VerifyTest extends TestCase
         $personalGpgDirectory = $this->makeGpgHomeDirectory();
         $foreignGpgDirectory  = $this->makeGpgHomeDirectory();
 
+        $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
+
         $vendorName  = 'Mr. Magoo';
         $vendorEmail = 'magoo@example.com';
-        $ownKey      = $this->makeKey($personalGpgDirectory, 'me@example.com', 'Just Me');
         $vendorKey   = $this->makeKey($foreignGpgDirectory, $vendorEmail, $vendorName);
         $vendorDir   = $this->makeVendorDirectory();
         $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);

@@ -13,6 +13,7 @@ use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
+use Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed;
 use Roave\ComposerGpgVerify\Package\Git\GitSignatureCheck;
 use Roave\ComposerGpgVerify\Package\GitPackage;
 use Roave\ComposerGpgVerify\Package\PackageVerification;
@@ -49,8 +50,9 @@ final class Verify implements PluginInterface, EventSubscriberInterface
 
     /**
      * @param Event $composerEvent
+     *
+     * @throws \Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed
      * @throws \LogicException
-     * @throws \RuntimeException
      */
     public static function verify(Event $composerEvent) : void
     {
@@ -85,19 +87,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
             return;
         }
 
-        throw new \RuntimeException(sprintf(
-            'The following packages need to be signed and verified, or added to exclusions: %s%s',
-            "\n",
-            implode(
-                "\n\n",
-                array_map(
-                    function (PackageVerification $failedVerification) : string {
-                        return $failedVerification->printReason();
-                    },
-                    $escapes
-                )
-            )
-        ));
+        throw PackagesTrustCheckFailed::fromFailedPackageVerifications(...$escapes);
     }
 
     private static function verifyPackage(

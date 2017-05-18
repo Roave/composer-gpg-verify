@@ -336,6 +336,28 @@ final class VerifyTest extends TestCase
         $this->assertWillFailPackageVerification();
     }
 
+    public function testWillRejectUnSignedTags() : void
+    {
+        $vendorName  = 'Mr. Magoo';
+        $vendorEmail = 'magoo@example.com';
+        $vendorDir   = $this->makeVendorDirectory();
+        $vendor1     = $this->makeDependencyGitRepository($vendorDir, 'vendor1/package1', $vendorEmail, $vendorName);
+
+        (new Process('git commit --allow-empty -m "unsigned commit"', $vendor1))
+            ->setTimeout(30)
+            ->mustRun();
+
+        (new Process('git tag unsigned-tag -m "unsigned tag"', $vendor1))
+            ->setTimeout(30)
+            ->mustRun();
+
+        $this->configureCorrectComposerSetup();
+
+        putenv('GNUPGHOME=' . $this->makeGpgHomeDirectory());
+
+        $this->assertWillFailPackageVerification();
+    }
+
     public function testWillRejectSignedCommitsFromUntrustedKeys() : void
     {
         $personalGpgDirectory = $this->makeGpgHomeDirectory();

@@ -104,9 +104,9 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         InstallationManager $installationManager,
         PackageInterface $package
     ) : PackageVerification {
-        $packageDirectory = $installationManager->getInstallPath($package);
+        $gitDirectory = $installationManager->getInstallPath($package) . '/.git';
 
-        if (! is_dir($packageDirectory . '/.git')) {
+        if (! is_dir($gitDirectory)) {
             return UnknownPackageFormat::fromNonGitPackage($package);
         }
 
@@ -116,7 +116,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         $checks  = [];
         $command = sprintf(
             'git --git-dir %s verify-commit --verbose HEAD 2>&1',
-            escapeshellarg($packageDirectory . '/.git')
+            escapeshellarg($gitDirectory)
         );
 
         exec($command, $output, $exitCode);
@@ -126,7 +126,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         exec(
             sprintf(
                 'git --git-dir %s tag --points-at HEAD 2>&1',
-                escapeshellarg($packageDirectory . '/.git')
+                escapeshellarg($gitDirectory)
             ),
             $tags
         );
@@ -135,7 +135,7 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         foreach (array_filter($tags) as $tag) {
             $command = sprintf(
                 'git --git-dir %s tag -v %s 2>&1',
-                escapeshellarg($packageDirectory . '/.git'),
+                escapeshellarg($gitDirectory),
                 escapeshellarg($tag)
             );
 

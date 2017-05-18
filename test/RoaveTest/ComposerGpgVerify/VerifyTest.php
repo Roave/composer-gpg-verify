@@ -50,9 +50,6 @@ final class VerifyTest extends TestCase
      * @var RepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $localRepository;
-//$composer->getRepositoryManager()->getLocalRepository()->getPackages();
-//    //$composer->getLocker()->getLockData()
-//$composer->getInstallationManager()->getInstallPath();
 
     /**
      * @var string

@@ -175,10 +175,10 @@ final class Verify implements PluginInterface, EventSubscriberInterface
         $preferredInstall = $config->get('preferred-install');
 
         if ('source' !== $preferredInstall) {
-//            throw new \LogicException(sprintf(
-//                'Expected installation "preferred-install" to be "source", found "%s" instead',
-//                (string) $preferredInstall
-//            ));
+            throw new \LogicException(sprintf(
+                'Expected installation "preferred-install" to be "source", found "%s" instead',
+                (string) $preferredInstall
+            ));
         }
     }
 }

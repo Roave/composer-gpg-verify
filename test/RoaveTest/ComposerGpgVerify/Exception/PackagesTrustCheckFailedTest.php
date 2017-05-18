@@ -10,7 +10,7 @@ use Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed;
 use Roave\ComposerGpgVerify\Package\PackageVerification;
 
 /**
- * @covers \Roave\ComposerGpgVerify\Verify
+ * @covers \Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed
  */
 final class PackagesTrustCheckFailedTest extends TestCase
 {

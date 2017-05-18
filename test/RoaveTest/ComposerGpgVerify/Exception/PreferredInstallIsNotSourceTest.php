@@ -21,7 +21,22 @@ final class PreferredInstallIsNotSourceTest extends TestCase
         self::assertInstanceOf(InvalidArgumentException::class, $exception);
         self::assertSame(
             <<<'EXPECTED'
-The detected preferred install required for the git verification to work correctly is "source", but your composer.json configuration reported ""foo""
+The detected preferred install required for the git verification to work correctly is "source", but your composer.json configuration reported "foo".
+Please edit your composer.json to enforce "source" installation as described at https://getcomposer.org/doc/06-config.md#preferred-install
+EXPECTED
+            ,
+            $exception->getMessage()
+        );
+    }
+    public function testFromArrayPreferredInstall() : void
+    {
+        $exception = PreferredInstallIsNotSource::fromPreferredInstall(['foo' => 'bar', 'baz' => 'tab']);
+
+        self::assertInstanceOf(PreferredInstallIsNotSource::class, $exception);
+        self::assertInstanceOf(InvalidArgumentException::class, $exception);
+        self::assertSame(
+            <<<'EXPECTED'
+The detected preferred install required for the git verification to work correctly is "source", but your composer.json configuration reported {"foo":"bar","baz":"tab"}.
 Please edit your composer.json to enforce "source" installation as described at https://getcomposer.org/doc/06-config.md#preferred-install
 EXPECTED
             ,

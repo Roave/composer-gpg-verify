@@ -14,6 +14,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed;
+use Roave\ComposerGpgVerify\Exception\PreferredInstallIsNotSource;
 use Roave\ComposerGpgVerify\Package\Git\GitSignatureCheck;
 use Roave\ComposerGpgVerify\Package\GitPackage;
 use Roave\ComposerGpgVerify\Package\PackageVerification;
@@ -45,7 +46,8 @@ final class Verify implements PluginInterface, EventSubscriberInterface
      * @param Event $composerEvent
      *
      * @throws \Roave\ComposerGpgVerify\Exception\PackagesTrustCheckFailed
-     * @throws \LogicException
+     * @throws \RuntimeException
+     * @throws \Roave\ComposerGpgVerify\Exception\PreferredInstallIsNotSource
      */
     public static function verify(Event $composerEvent) : void
     {
@@ -167,18 +169,15 @@ final class Verify implements PluginInterface, EventSubscriberInterface
      * @param Config $config
      *
      *
-     * @throws \LogicException
      * @throws \RuntimeException
+     * @throws \Roave\ComposerGpgVerify\Exception\PreferredInstallIsNotSource
      */
     private static function assertSourceInstallation(Config $config) : void
     {
         $preferredInstall = $config->get('preferred-install');
 
         if ('source' !== $preferredInstall) {
-            throw new \LogicException(sprintf(
-                'Expected installation "preferred-install" to be "source", found "%s" instead',
-                (string) $preferredInstall
-            ));
+            throw PreferredInstallIsNotSource::fromPreferredInstall($preferredInstall);
         }
     }
 }

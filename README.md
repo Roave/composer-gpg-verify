@@ -1,5 +1,6 @@
 ## Composer GPG signature verification plugin
 
+[![Packagist](https://img.shields.io/packagist/v/roave/composer-gpg-verify.svg)](https://packagist.org/packages/roave/composer-gpg-verify)
 [![Build Status](https://travis-ci.org/Roave/composer-gpg-verify.svg?branch=master)](https://travis-ci.org/Roave/composer-gpg-verify)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Roave/composer-gpg-verify/?branch=master)

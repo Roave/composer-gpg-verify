@@ -161,6 +161,24 @@ final class VerifyTest extends TestCase
         }
     }
 
+    public function testWillRejectNonGitPackages() : void
+    {
+        $packageName = 'vendor1/package1';
+        $vendor1     = sys_get_temp_dir() . '/' . uniqid('vendor', true) . '/' . $packageName;
+
+        /* @var $package PackageInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $package = $this->createMock(PackageInterface::class);
+
+        $package->expects(self::any())->method('getName')->willReturn($packageName);
+
+        $this->installedPackages[$vendor1] = $package;
+
+        self::assertTrue(mkdir($vendor1, 0700, true));
+        $this->configureCorrectComposerSetup();
+
+        $this->assertWillFailPackageVerification();
+    }
+
     public function testWillAcceptSignedAndTrustedPackages() : void
     {
         $gpgHomeDirectory = $this->makeGpgHomeDirectory();

@@ -71,28 +71,23 @@ get the following failure during the first installation:
 composer require some-vendor/some-package --prefer-source
 # ... lots of lines here ...
 The following packages need to be signed and verified, or added to exclusions:
+
 some-vendor/some-package
+[SIGNED] [NOT VERIFIED] Commit #4b825dc642cb6eb9a060e54bf8d69288fbee4904 (Key AABBCCDDEEFF1122)
+Command: git verify-commit --verbose HEAD
+Exit code: 1
+Output: tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author Mr. Maintainer <maintainer@example.com> 1495040303 +0200
+committer Mr. Maintainer <maintainer@example.com> 1495040303 +0200
+
+signed commit
+gpg: Signature made Mi 17 Mai 2017 18:58:23 CEST
+gpg:                using RSA key AABBCCDDEEFF1122
+gpg: Can't check signature: No public key
+... more lines ...
 ```
 
 This means that `some-vendor/some-package` is not trusted.
-
-Let's try figuring out who signed it:
-
-```sh
-cd vendor/some-vendor/some-package
-# either of the following should work:
-git verify-commit HEAD
-# replace <<CURRENT-TAG>> with the tag you are on
-git tag -v <<CURRENT-TAG>>
-```
-
-You should see something like following in the output:
-
-```
-gpg: Signature made Mi 22 Feb 2017 20:10:00 CET
-gpg:                using RSA key AABBCCDDEEFF1122
-gpg: Can't check signature: No public key
-```
 
 That `AABBCCDDEEFF1122` is the key you are missing. Let's download it:
 
